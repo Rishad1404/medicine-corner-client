@@ -6,11 +6,12 @@ import { NavMenu } from "@/components/shared/nav-menu";
 import { NavigationSheet } from "@/components/shared/navigation-sheet";
 import Link from "next/link";
 import { ModeToggle } from "./ModeToggle";
+// Removed CartButton import
 
 const Navbar = () => {
   return (
     <nav className="sticky top-0 z-50 w-full backdrop-blur h-20 border-b bg-background">
-      <div className=" mx-auto flex h-full max-w-(--breakpoint-xl) items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-full max-w-(--breakpoint-xl) items-center justify-between px-4 sm:px-6 lg:px-8">
         <Logo />
 
         {/* Desktop Menu */}
@@ -19,14 +20,17 @@ const Navbar = () => {
         <div className="flex items-center gap-3">
           <ModeToggle />
 
-          <Button className="sm:inline-flex font-semibold" variant="outline">
+          {/* Login - Hidden on mobile, visible on desktop (md) */}
+          <Button className="hidden md:inline-flex font-semibold" variant="outline" asChild>
             <Link href="/login">Login</Link>
           </Button>
-          <Button className="font-semibold">
+
+          {/* Register - Hidden on mobile, visible on desktop (md) */}
+          <Button className="hidden md:inline-flex font-semibold" asChild>
             <Link href="/register">Register</Link>
           </Button>
 
-          {/* Mobile Menu */}
+          {/* Mobile Menu Trigger */}
           <div className="md:hidden">
             <NavigationSheet />
           </div>

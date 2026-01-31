@@ -46,10 +46,10 @@ const UserDropdown = ({ trigger, defaultOpen, align = "end" }: Props) => {
         <DropdownMenuTrigger>{trigger}</DropdownMenuTrigger>
         <DropdownMenuContent
           align={align}
-          className="w-3xs rounded-2xl data-open:slide-in-from-bottom-20! data-closed:slide-out-to-bottom-20 data-open:fade-in-0 data-closed:fade-out-0 data-closed:zoom-out-100 duration-400"
+          className="w-3xs rounded-2xl data-open:slide-in-from-bottom-20! data-closed:slide-out-to-bottom-20 data-open:fade-in-0 data-closed:fade-out-0 data-closed:zoom-out-100 duration-400 mr-4"
         >
           {/* User Info */}
-          <DropdownMenuLabel className="flex items-center gap-3 px-4 py-3">
+          <DropdownMenuLabel className="flex items-center gap-3 px-4 py-3 mr-10">
             <div className="relative">
               <Avatar className="data-[size=lg]:size-8">
                 <AvatarImage
@@ -97,11 +97,6 @@ const UserDropdown = ({ trigger, defaultOpen, align = "end" }: Props) => {
 
           <DropdownMenuSeparator />
 
-          {/* Logout */}
-          <DropdownMenuItem variant="destructive" className={itemClass}>
-            <LOGOUT_ITEM.icon size={20} />
-            <span>{LOGOUT_ITEM.label}</span>
-          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
