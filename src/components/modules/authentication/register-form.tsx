@@ -26,7 +26,7 @@ import { useRouter } from "next/navigation";
 const formSchema = z.object({
   name: z.string().min(4, "This field is required"),
   email: z.email(),
-  password: z.string().min(6, "Minimum length is 8"),
+  password: z.string().min(6, "Minimum length is 6"),
   role: z.string(),
 });
 

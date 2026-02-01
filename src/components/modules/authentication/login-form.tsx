@@ -36,7 +36,8 @@ const loginSchema = z.object({
 const LoginForm = () => {
   const [isVisible, setIsVisible] = useState(false);
   const session = authClient.useSession();
-  const route=useRouter()
+
+  const route = useRouter();
 
   // 2. Initialize Form
   const form = useForm({
@@ -57,7 +58,14 @@ const LoginForm = () => {
         }
 
         toast.success("Logged In Successfully", { id: toastId });
-        route.push("/");
+
+
+        const user = data.user as any;
+        if (user.role === "ADMIN") {
+          route.push("/admin"); // Redirect Admin to Dashboard
+        } else {
+          route.push("/"); // Redirect Customer/Seller to Home
+        }
       } catch (error) {
         toast.error("Something went wrong, please try again", { id: toastId });
       }

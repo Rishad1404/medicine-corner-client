@@ -11,11 +11,12 @@ import { authClient } from "@/lib/auth-client";
 
 import UserDropdown from "@/components/shadcn-space/blocks/dashboard-shell-01/user-dropdown";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { CartSidebar } from "../shared/cart-sidebar";
 
 const Navbar = () => {
 
   const session = authClient.useSession();
-  const user = session.data?.user;
+  const  user = session.data?.user;
 
   return (
     <nav className="sticky top-0 z-50 w-full backdrop-blur h-20 border-b bg-background">
@@ -26,13 +27,16 @@ const Navbar = () => {
         <NavMenu className="hidden md:block" />
 
         <div className="flex items-center gap-3">
+
+        <CartSidebar/>
+
           <ModeToggle />
 
           {user ? (
 
             <div className="hidden md:flex items-center gap-2">
               <UserDropdown
-                align="end" 
+                user={user as any}
                 trigger={
                   <div className="rounded-full border shadow-sm cursor-pointer hover:opacity-80 transition-opacity">
                     <Avatar className="size-9">

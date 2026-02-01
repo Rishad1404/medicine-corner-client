@@ -4,7 +4,7 @@ import { ContainerIcon, LayoutDashboard, ListOrdered, PillIcon } from "lucide-re
 
 export const sellerRoutes: NavItem[] = [
   { label: "Overview", isSection: true },
-  { title: "Dashboard", icon: LayoutDashboard, href: "/seller/dashboard" },
+  { title: "Dashboard", icon: LayoutDashboard, href: "/seller" },
 
   { label: "Inventory Management", isSection: true },
   { title: "Create Medicine",icon:PillIcon, href: "/seller/medicines/create" },
