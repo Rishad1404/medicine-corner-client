@@ -1,12 +1,13 @@
 import HeroSection from "@/components/HeroSection";
-import { authClient } from "@/lib/auth-client";
+import { userService } from "../services/user.service";
+
 
 
 export default async function Home() {
 
-  const  session =await authClient.getSession();
+  const {data,error}=await userService.getSession()
+  console.log(data);
 
-  console.log(session);
   return (
     <div>
       <HeroSection/>

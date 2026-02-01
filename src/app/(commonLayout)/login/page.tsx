@@ -1,8 +1,8 @@
-import Login from "@/components/shadcn-studio/blocks/login-page-01/login-form"
+import LoginForm from "@/components/modules/authentication/login-form"
 
 
 const LoginPage = () => {
-  return <Login />
+  return <LoginForm/>
 }
 
 export default LoginPage

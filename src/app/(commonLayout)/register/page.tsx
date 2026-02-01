@@ -1,5 +1,5 @@
 import AuthBackgroundShape from "@/assets/svg/auth-background-shape";
-import { RegisterForm } from "@/components/shadcn-studio/blocks/register-page-01/register-form";
+import { RegisterForm } from "@/components/modules/authentication/register-form";
 
 
 const Register = () => {

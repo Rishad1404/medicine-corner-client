@@ -1,6 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+ // 1. Use Server Auth Instance
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import AppSidebar from "@/components/shadcn-space/blocks/dashboard-shell-01/app-sidebar";
+import { authClient } from "@/lib/auth-client";
 
-export default function Page({
+export default async function Layout({
+  children,
   admin,
   seller,
   customer,
@@ -10,17 +16,32 @@ export default function Page({
   seller: React.ReactNode;
   customer: React.ReactNode;
 }) {
-  const userInfo = {
-    role: "ADMIN",
-  };
+  // 2. Fetch session properly with headers
+const { data } = await authClient.getSession({
+    fetchOptions: {
+      headers: await headers(), 
+    },
+  });
+
+  // 3. Redirect if not logged in
+  if (!data) {
+    return redirect("/login");
+  }
+
+  // 4. Extract and Normalize Data
+ const user=data.user
+  const role = (user as any).role.toUpperCase();
 
   return (
-    <AppSidebar user={userInfo}>
-      {userInfo.role === "ADMIN" && admin}
+    <AppSidebar user={{ ...user, role }}>
+      
+      {/* 5. Render Parallel Routes based on Role */}
+      {role === "ADMIN" && admin}
 
-      {userInfo.role === "SELLER" && seller}
+      {role === "SELLER" && seller}
 
-      {userInfo.role === "CUSTOMER" && customer}
+      {role === "CUSTOMER" && customer}
+
     </AppSidebar>
   );
 }
