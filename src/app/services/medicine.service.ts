@@ -85,7 +85,6 @@ export const medicineService = {
     try {
       const cookieStore = await cookies();
 
-
       const res = await fetch(`${API_URL}/medicines/${id}`, {
         method: "GET",
         headers: {
@@ -107,7 +106,6 @@ export const medicineService = {
       };
     }
   },
-
 
   deleteMedicine: async function (id: string) {
     try {
@@ -141,12 +139,12 @@ export const medicineService = {
     }
   },
 
-updateMedicine: async function (id: string, medicineData: any) {
+  updateMedicine: async function (id: string, medicineData: any) {
     try {
       const cookieStore = await cookies();
-      const methodUsed="PATCH";
+      const methodUsed = "PATCH";
       const res = await fetch(`${API_URL}/seller/medicines/${id}`, {
-        method: methodUsed, 
+        method: methodUsed,
         headers: {
           "Content-Type": "application/json",
           Cookie: cookieStore.toString(),
@@ -156,14 +154,41 @@ updateMedicine: async function (id: string, medicineData: any) {
 
       if (!res.ok) {
         const errorData = await res.json();
-        return { success: false, message: errorData.message || "Failed to update" };
+        return {
+          success: false,
+          message: errorData.message || "Failed to update",
+        };
       }
 
       const response = await res.json();
-      return { success: true, message: "Medicine updated successfully", data: response };
+      return {
+        success: true,
+        message: "Medicine updated successfully",
+        data: response,
+      };
     } catch (error) {
       console.error("Service Update Error:", error);
       return { success: false, message: "Network error" };
     }
   },
-}
+
+  getAllMedicines: async (search?: string, category?: string) => {
+   try {
+      const params = new URLSearchParams();
+      if (search) params.append("searchTerm", search);
+      if (category) params.append("category", category);
+
+      const res = await fetch(`${API_URL}/medicines?${params.toString()}`, {
+        next: { tags: ["medicines"] },
+        cache: "no-store",
+      });
+
+      const result = await res.json();
+      
+
+      return result; 
+    } catch (error) {
+      return { data: [], error };
+    }
+  },
+};

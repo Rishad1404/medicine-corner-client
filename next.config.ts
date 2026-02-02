@@ -10,6 +10,18 @@ const nextConfig: NextConfig = {
         destination:`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/:path*`,
       }
     ]
+  },
+  images:{
+    remotePatterns:[
+{
+        protocol: 'https',
+        hostname: 'i.ibb.co.com', 
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.ibb.co',
+      },
+    ]
   }
 };
 

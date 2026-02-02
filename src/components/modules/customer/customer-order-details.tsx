@@ -135,7 +135,7 @@ export function OrderDetailsModal({ order }: { order: any }) {
                 <div className="space-y-3 px-2">
                   <div className="flex justify-between items-center text-xs font-black uppercase text-slate-400 tracking-widest">
                     <span>Grand Total</span>
-                    <span className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">৳{order.totalAmount.toLocaleString()}</span>
+                    <span className="text-xl font-black text-slate-900 dark:text-white tracking-tighter">৳{order.totalAmount.toLocaleString()}</span>
                   </div>
                 </div>
                 
