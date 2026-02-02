@@ -81,4 +81,18 @@ export const orderService = {
     });
     return await res.json();
   },
+
+  getCustomerOrders: async () => {
+    const cookieStore = await cookies();
+    
+    const res = await fetch(`${API_URL}/orders`, {
+      method: "GET",
+      headers: {
+        Cookie: cookieStore.toString(),
+      },
+      cache: "no-store",
+    });
+    
+    return await res.json();
+  },
 };

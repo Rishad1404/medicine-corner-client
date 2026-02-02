@@ -31,7 +31,7 @@ export default async function ManageCategoriesPage() {
           <div className="hidden lg:flex items-center gap-8 px-8 py-5 bg-white dark:bg-slate-900 rounded-[2rem] border-2 border-slate-100 dark:border-slate-800 shadow-sm">
             <div className="flex flex-col">
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Groups</span>
-              <span className="text-2xl font-black text-slate-900 dark:text-white">{categories?.length || 0}</span>
+              <span className="text-2xl font-black text-slate-900 dark:text-white">{categories?.data.length || 0}</span>
             </div>
             <div className="h-10 w-[2px] bg-slate-100 dark:bg-slate-800" />
             <div className="flex flex-col text-center">
@@ -58,8 +58,7 @@ export default async function ManageCategoriesPage() {
           <CategoryFormModal mode="create" />
         </div>
 
-        {/* --- TABLE SECTION --- */}
-        {/* Pass the array directly to the table */}
+
         <CategoryManagementTable data={categories.data || []} />
       </div>
 

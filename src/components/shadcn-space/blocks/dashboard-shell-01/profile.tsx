@@ -15,10 +15,21 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
-  Camera, Mail, MapPin, Phone, User, Save, 
-  ShieldCheck, CreditCard, CheckCircle2, 
-  KeyRound, BellRing, UserCheck 
+import {
+  Camera,
+  Mail,
+  MapPin,
+  Phone,
+  User,
+  Save,
+  ShieldCheck,
+  CreditCard,
+  CheckCircle2,
+  KeyRound,
+  BellRing,
+  UserCheck,
+  Loader2,
+  ImageIcon,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -38,18 +49,22 @@ export default function ProfileBlock({ user }: ProfileBlockProps) {
 
   return (
     <div className="max-w-6xl mx-auto pb-20 animate-in fade-in duration-500">
-      
       {/* 1. HERO / COVER SECTION */}
       <div className="relative mb-20">
         <div className="h-48 w-full rounded-xl bg-gradient-to-r from-primary/20 via-blue-500/10 to-purple-500/20 border border-border/50" />
-        
+
         <div className="absolute -bottom-12 left-8 flex flex-col md:flex-row items-end gap-6">
           <div className="relative group">
             <Avatar className="h-32 w-32 border-4 border-background shadow-2xl transition-transform group-hover:scale-[1.02]">
               <AvatarImage src={user.image || ""} className="object-cover" />
-              <AvatarFallback className="text-4xl font-bold bg-muted">{user.name.charAt(0)}</AvatarFallback>
+              <AvatarFallback className="text-4xl font-bold bg-muted">
+                {user.name.charAt(0)}
+              </AvatarFallback>
             </Avatar>
-            <Button size="icon" className="absolute bottom-1 right-1 h-9 w-9 rounded-full shadow-lg">
+            <Button
+              size="icon"
+              className="absolute bottom-1 right-1 h-9 w-9 rounded-full shadow-lg"
+            >
               <Camera className="h-4 w-4" />
             </Button>
           </div>
@@ -69,12 +84,13 @@ export default function ProfileBlock({ user }: ProfileBlockProps) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-12">
-        
         {/* 2. SIDEBAR INFO */}
         <div className="lg:col-span-4 space-y-6">
           <Card className="shadow-sm border-border/50">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Profile Completion</CardTitle>
+              <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                Profile Completion
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between text-sm mb-1">
@@ -90,7 +106,8 @@ export default function ProfileBlock({ user }: ProfileBlockProps) {
                   <CheckCircle2 className="h-4 w-4" /> Account Secured
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground opacity-60">
-                  <div className="h-4 w-4 rounded-full border-2 border-muted" /> Add Phone Number
+                  <div className="h-4 w-4 rounded-full border-2 border-muted" />{" "}
+                  Add Phone Number
                 </div>
               </div>
             </CardContent>
@@ -99,13 +116,14 @@ export default function ProfileBlock({ user }: ProfileBlockProps) {
           <Card className="bg-primary/[0.02] border-primary/10">
             <CardContent className="pt-6 space-y-4">
               <div className="flex items-center gap-3">
-                 <div className="p-2 bg-primary/10 rounded-lg">
-                    <UserCheck className="h-5 w-5 text-primary" />
-                 </div>
-                 <div className="text-sm font-medium">Verified Identity</div>
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <UserCheck className="h-5 w-5 text-primary" />
+                </div>
+                <div className="text-sm font-medium">Verified Identity</div>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Your identity has been verified as a {user.role.toLowerCase()} on Medicine Corner. This builds trust with our community.
+                Your identity has been verified as a {user.role.toLowerCase()}{" "}
+                on Medicine Corner. This builds trust with our community.
               </p>
             </CardContent>
           </Card>
@@ -129,13 +147,42 @@ export default function ProfileBlock({ user }: ProfileBlockProps) {
             </div>
 
             {/* --- TAB: GENERAL --- */}
+            {/* --- TAB: GENERAL --- */}
             <TabsContent value="general" className="space-y-6">
               <Card className="shadow-sm border-border/50">
                 <CardHeader>
                   <CardTitle>Personal Details</CardTitle>
-                  <CardDescription>Manage your primary contact information.</CardDescription>
+                  <CardDescription>
+                    Manage your primary contact and identity information.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-6">
+                  {/* --- ADDED: PROFILE IMAGE LINK INPUT --- */}
+                  <div className="space-y-2">
+                    <Label htmlFor="image">Profile Image URL</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="image"
+                        placeholder="https://example.com/your-image.jpg"
+                        defaultValue={user.image || ""}
+                      />
+                      <div className="h-10 w-10 shrink-0 rounded-md border bg-muted flex items-center justify-center overflow-hidden">
+                        {user.image ? (
+                          <img
+                            src={user.image}
+                            alt="Preview"
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground italic px-1">
+                      Paste a direct link to a hosted image (JPG, PNG, or WebP).
+                    </p>
+                  </div>
+
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Full Name</Label>
@@ -148,16 +195,29 @@ export default function ProfileBlock({ user }: ProfileBlockProps) {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email Address</Label>
-                    <Input id="email" defaultValue={user.email} disabled className="bg-muted/50" />
+                    <Input
+                      id="email"
+                      defaultValue={user.email}
+                      disabled
+                      className="bg-muted/50"
+                    />
                     <p className="text-[11px] text-muted-foreground italic px-1">
                       Verified email cannot be changed directly.
                     </p>
                   </div>
                 </CardContent>
                 <CardFooter className="bg-muted/30 border-t justify-end py-3">
-                   <Button className="gap-2 shadow-sm">
-                      <Save className="h-4 w-4" /> Save Profile
-                   </Button>
+                  <Button
+                    className="gap-2 shadow-sm"
+                    onClick={() => setIsLoading(true)}
+                  >
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Save className="h-4 w-4" />
+                    )}
+                    Save Profile
+                  </Button>
                 </CardFooter>
               </Card>
             </TabsContent>
@@ -167,12 +227,17 @@ export default function ProfileBlock({ user }: ProfileBlockProps) {
               <Card className="shadow-sm border-border/50">
                 <CardHeader>
                   <CardTitle>Default Shipping Address</CardTitle>
-                  <CardDescription>Set your primary location for fast checkouts.</CardDescription>
+                  <CardDescription>
+                    Set your primary location for fast checkouts.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
                     <Label>Street Address</Label>
-                    <Textarea className="min-h-[100px] bg-muted/20" placeholder="123 Road, Area, House No..." />
+                    <Textarea
+                      className="min-h-[100px] bg-muted/20"
+                      placeholder="123 Road, Area, House No..."
+                    />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -186,9 +251,9 @@ export default function ProfileBlock({ user }: ProfileBlockProps) {
                   </div>
                 </CardContent>
                 <CardFooter className="bg-muted/30 border-t justify-end py-3">
-                   <Button variant="outline" className="gap-2">
-                      <Save className="h-4 w-4" /> Update Address
-                   </Button>
+                  <Button variant="outline" className="gap-2">
+                    <Save className="h-4 w-4" /> Update Address
+                  </Button>
                 </CardFooter>
               </Card>
             </TabsContent>
@@ -198,7 +263,9 @@ export default function ProfileBlock({ user }: ProfileBlockProps) {
               <Card className="shadow-sm border-border/50">
                 <CardHeader>
                   <CardTitle>Password Management</CardTitle>
-                  <CardDescription>We recommend changing your password every 6 months.</CardDescription>
+                  <CardDescription>
+                    We recommend changing your password every 6 months.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid gap-2">
@@ -211,22 +278,28 @@ export default function ProfileBlock({ user }: ProfileBlockProps) {
                   </div>
                 </CardContent>
                 <CardFooter className="bg-muted/30 border-t justify-end py-3 text-right">
-                  <Button variant="secondary" className="gap-2">Update Security</Button>
+                  <Button variant="secondary" className="gap-2">
+                    Update Security
+                  </Button>
                 </CardFooter>
               </Card>
 
               <Card className="border-blue-100 bg-blue-50/50 dark:bg-blue-950/20 dark:border-blue-900/50 shadow-none">
-                 <CardContent className="pt-6 flex items-start gap-4">
-                    <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-full">
-                       <BellRing className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div className="space-y-1">
-                       <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100">Security Notification</h4>
-                       <p className="text-xs text-blue-700/80 dark:text-blue-300/80 leading-relaxed">
-                          Your last password change was 3 months ago. Enabling 2FA (Two-Factor Authentication) will significantly improve your account safety.
-                       </p>
-                    </div>
-                 </CardContent>
+                <CardContent className="pt-6 flex items-start gap-4">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-full">
+                    <BellRing className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+                      Security Notification
+                    </h4>
+                    <p className="text-xs text-blue-700/80 dark:text-blue-300/80 leading-relaxed">
+                      Your last password change was 3 months ago. Enabling 2FA
+                      (Two-Factor Authentication) will significantly improve
+                      your account safety.
+                    </p>
+                  </div>
+                </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
