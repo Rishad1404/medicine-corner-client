@@ -25,8 +25,8 @@ interface ProfileBlockProps {
     email: string;
     image?: string | null;
     role: string;
-    phone?: string;   // Optional for now
-    address?: string; // Optional for now
+    phone?: string;   
+    address?: string; 
   };
 }
 

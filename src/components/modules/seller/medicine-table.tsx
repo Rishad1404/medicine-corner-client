@@ -51,6 +51,21 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { MedicineDetailsModal } from "./medicine-details-modal";
+
+import { deleteMedicine } from "@/actions/medicine.actions"; // Ensure this path is correct based on your folder structure
+import { EditMedicineModal } from "./edit-medicine-form";
+
 // --- 1. TYPES ---
 export interface Medicine {
   id: string;
@@ -60,6 +75,8 @@ export interface Medicine {
   stock: number;
   expiryDate: string;
   image?: string;
+  description?: string;
+  categoryId?: string; 
   category?: { name: string };
 }
 
@@ -75,30 +92,12 @@ interface MedicineTableProps {
   meta: Meta;
 }
 
-// --- 2. HELPER COMPONENTS ---
 function StatusBadge({ stock }: { stock: number }) {
-  if (stock <= 0) {
-    return (
-      <Badge variant="outline" className="border-red-200 bg-red-50 text-red-700">
-        Out of Stock
-      </Badge>
-    );
-  }
-  if (stock <= 5) {
-    return (
-      <Badge variant="outline" className="border-amber-200 bg-amber-50 text-amber-700">
-        Low Stock ({stock})
-      </Badge>
-    );
-  }
-  return (
-    <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700">
-      In Stock ({stock})
-    </Badge>
-  );
+  if (stock <= 0) return <Badge variant="outline" className="border-red-200 bg-red-50 text-red-700">Out of Stock</Badge>;
+  if (stock <= 5) return <Badge variant="outline" className="border-amber-200 bg-amber-50 text-amber-700">Low Stock</Badge>;
+  return <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700">In Stock ({stock})</Badge>;
 }
 
-// --- 3. MAIN COMPONENT ---
 export function MedicineTable({ data, meta }: MedicineTableProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -107,11 +106,16 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
   const [rowSelection, setRowSelection] = useState({});
   const [sorting, setSorting] = useState<SortingState>([]);
 
+  // States for Modals
+  const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(null);
+  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [medicineToDelete, setMedicineToDelete] = useState<string | null>(null);
+
   // --- ACTIONS ---
   const updateUrl = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (value) params.set(key, value);
-    else params.delete(key);
+    if (value) params.set(key, value); else params.delete(key);
     if (key !== "page") params.set("page", "1");
     router.push(`${pathname}?${params.toString()}`);
   };
@@ -125,20 +129,20 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
     router.push(`${pathname}?${params.toString()}`);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure? This cannot be undone.")) return;
+  const confirmDelete = async () => {
+    if (!medicineToDelete) return;
     const toastId = toast.loading("Deleting item...");
     try {
-      const res = await fetch(`/api/medicines/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed");
-      toast.success("Item deleted", { id: toastId });
-      router.refresh();
-    } catch (err) {
-      toast.error("Could not delete item", { id: toastId });
+      const result = await deleteMedicine(medicineToDelete);
+      if (!result.success) throw new Error(result.message);
+      toast.success(result.message, { id: toastId });
+      setMedicineToDelete(null); 
+      router.refresh(); 
+    } catch (err: any) {
+      toast.error(err.message || "Could not delete item", { id: toastId });
     }
   };
 
-  // --- COLUMNS DEFINITION ---
   const columns: ColumnDef<Medicine>[] = [
     {
       id: "select",
@@ -196,7 +200,6 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
     },
     {
       id: "actions",
-      // 👇 ADDED HEADER HERE
       header: () => <div className="text-right">Actions</div>,
       cell: ({ row }) => (
         <div className="text-right">
@@ -211,23 +214,31 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
               
-              <DropdownMenuItem asChild>
-                <Link href={`/dashboard/seller/medicines/${row.original.id}`} className="cursor-pointer flex items-center">
-                  <Eye className="mr-2 h-3.5 w-3.5 text-muted-foreground" /> View Details
-                </Link>
+              <DropdownMenuItem 
+                className="cursor-pointer flex items-center"
+                onClick={() => {
+                   setSelectedMedicine(row.original);
+                   setIsViewOpen(true);
+                }}
+              >
+                 <Eye className="mr-2 h-3.5 w-3.5 text-muted-foreground" /> View Details
               </DropdownMenuItem>
 
-              <DropdownMenuItem asChild>
-                <Link href={`/dashboard/seller/medicines/${row.original.id}/edit`} className="cursor-pointer flex items-center">
+              <DropdownMenuItem 
+                 className="cursor-pointer flex items-center"
+                 onClick={() => {
+                   setSelectedMedicine(row.original);
+                   setIsEditOpen(true);
+                 }}
+              >
                   <Pencil className="mr-2 h-3.5 w-3.5 text-muted-foreground" /> Edit Info
-                </Link>
               </DropdownMenuItem>
               
               <DropdownMenuSeparator />
               
               <DropdownMenuItem 
                 className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer flex items-center"
-                onClick={() => handleDelete(row.original.id)}
+                onClick={() => setMedicineToDelete(row.original.id)}
               >
                 <Trash2 className="mr-2 h-3.5 w-3.5" /> Delete
               </DropdownMenuItem>
@@ -238,7 +249,6 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
     },
   ];
 
-  // --- TABLE INSTANCE ---
   const table = useReactTable({
     data,
     columns,
@@ -246,10 +256,7 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
     manualPagination: true,
     pageCount: meta.totalPage,
     state: {
-      pagination: {
-        pageIndex: meta.page - 1,
-        pageSize: meta.limit,
-      },
+      pagination: { pageIndex: meta.page - 1, pageSize: meta.limit },
       sorting,
       rowSelection,
     },
@@ -258,37 +265,19 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
   });
 
   const pageNumbers = Array.from({ length: meta.totalPage }, (_, i) => i + 1);
-
-  const currentSort = searchParams.get("sortBy") 
-    ? `${searchParams.get("sortBy")}-${searchParams.get("sortOrder")}` 
-    : "createdAt-desc";
+  const currentSort = searchParams.get("sortBy") ? `${searchParams.get("sortBy")}-${searchParams.get("sortOrder")}` : "createdAt-desc";
 
   return (
     <div className="space-y-4">
-      
-      {/* --- TOOLBAR --- */}
+      {/* Toolbar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-card rounded-lg p-4 border shadow-sm">
-        
-        {/* Left: Search & Sort */}
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <div className="relative w-full sm:w-[300px]">
              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-             <Input
-               placeholder="Filter medicines..."
-               defaultValue={searchParams.get("search") || ""}
-               onChange={(e) => updateUrl("search", e.target.value)}
-               className="pl-9 h-9 bg-background focus-visible:ring-1"
-             />
+             <Input placeholder="Filter medicines..." defaultValue={searchParams.get("search") || ""} onChange={(e) => updateUrl("search", e.target.value)} className="pl-9 h-9 bg-background focus-visible:ring-1" />
           </div>
-
-          <Select
-             value={currentSort}
-             onValueChange={(value) => handleSort(value)}
-           >
-             <SelectTrigger className="w-full sm:w-[180px] h-9">
-               <Filter className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
-               <SelectValue placeholder="Sort by" />
-             </SelectTrigger>
+          <Select value={currentSort} onValueChange={(value) => handleSort(value)}>
+             <SelectTrigger className="w-full sm:w-[180px] h-9"><Filter className="mr-2 h-3.5 w-3.5 text-muted-foreground" /><SelectValue placeholder="Sort by" /></SelectTrigger>
              <SelectContent>
                <SelectItem value="createdAt-desc">Newest Added</SelectItem>
                <SelectItem value="price-asc">Price: Low to High</SelectItem>
@@ -297,37 +286,19 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
              </SelectContent>
            </Select>
         </div>
-        
-        {/* Right: Rows & Selection */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground hidden sm:inline">Rows:</span>
-            <Select
-              value={String(meta.limit)}
-              onValueChange={(value) => updateUrl("limit", value)}
-            >
-              <SelectTrigger className="h-9 w-[70px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {[5, 10, 20, 50].map((size) => (
-                  <SelectItem key={size} value={String(size)}>
-                    {size}
-                  </SelectItem>
-                ))}
-              </SelectContent>
+            <Select value={String(meta.limit)} onValueChange={(value) => updateUrl("limit", value)}>
+              <SelectTrigger className="h-9 w-[70px]"><SelectValue /></SelectTrigger>
+              <SelectContent>{[5, 10, 20, 50].map((size) => (<SelectItem key={size} value={String(size)}>{size}</SelectItem>))}</SelectContent>
             </Select>
           </div>
-
-          {Object.keys(rowSelection).length > 0 && (
-             <div className="text-sm text-muted-foreground bg-muted/50 px-2 py-1 rounded">
-                 {Object.keys(rowSelection).length} selected
-             </div>
-          )}
+          {Object.keys(rowSelection).length > 0 && (<div className="text-sm text-muted-foreground bg-muted/50 px-2 py-1 rounded">{Object.keys(rowSelection).length} selected</div>)}
         </div>
       </div>
 
-      {/* --- TABLE --- */}
+      {/* Table */}
       <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
         <Table>
           <TableHeader>
@@ -344,76 +315,55 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
           <TableBody>
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="hover:bg-muted/30 data-[state=selected]:bg-muted/50 transition-colors border-b last:border-0 border-border/50"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="p-4 align-middle">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"} className="hover:bg-muted/30 data-[state=selected]:bg-muted/50 transition-colors border-b last:border-0 border-border/50">
+                  {row.getVisibleCells().map((cell) => (<TableCell key={cell.id} className="p-4 align-middle">{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>))}
                 </TableRow>
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-[300px] text-center">
-                  <div className="flex flex-col items-center justify-center space-y-2">
-                    <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                        <Search className="h-5 w-5 text-muted-foreground/50" />
-                    </div>
-                    <p className="text-base font-medium text-muted-foreground">No medicines found</p>
-                  </div>
-                </TableCell>
-              </TableRow>
+              <TableRow><TableCell colSpan={columns.length} className="h-[300px] text-center"><div className="flex flex-col items-center justify-center space-y-2"><div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center"><Search className="h-5 w-5 text-muted-foreground/50" /></div><p className="text-base font-medium text-muted-foreground">No medicines found</p></div></TableCell></TableRow>
             )}
           </TableBody>
         </Table>
       </div>
 
-      {/* --- PAGINATION --- */}
+      {/* Pagination */}
       <div className="flex items-center justify-between border-t p-4 bg-card rounded-b-lg">
-        <p className="text-sm text-muted-foreground">
-          Showing <span className="font-medium text-foreground">{(meta.page - 1) * meta.limit + 1}</span> to{" "}
-          <span className="font-medium text-foreground">{Math.min(meta.page * meta.limit, meta.total)}</span> of{" "}
-          <span className="font-medium text-foreground">{meta.total}</span> entries
-        </p>
-
+        <p className="text-sm text-muted-foreground">Showing <span className="font-medium text-foreground">{(meta.page - 1) * meta.limit + 1}</span> to <span className="font-medium text-foreground">{Math.min(meta.page * meta.limit, meta.total)}</span> of <span className="font-medium text-foreground">{meta.total}</span> entries</p>
         <div className="flex items-center gap-1.5">
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => updateUrl("page", String(meta.page - 1))}
-            disabled={meta.page <= 1}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-
-          {pageNumbers.slice(Math.max(0, meta.page - 3), meta.page + 2).map((page) => (
-            <Button
-              key={page}
-              variant={meta.page === page ? "default" : "outline"}
-              size="sm"
-              className={cn("h-8 w-8 p-0", meta.page === page ? "pointer-events-none" : "")}
-              onClick={() => updateUrl("page", String(page))}
-            >
-              {page}
-            </Button>
-          ))}
-
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => updateUrl("page", String(meta.page + 1))}
-            disabled={meta.page >= meta.totalPage}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+          <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateUrl("page", String(meta.page - 1))} disabled={meta.page <= 1}><ChevronLeft className="h-4 w-4" /></Button>
+          {pageNumbers.slice(Math.max(0, meta.page - 3), meta.page + 2).map((page) => (<Button key={page} variant={meta.page === page ? "default" : "outline"} size="sm" className={cn("h-8 w-8 p-0", meta.page === page ? "pointer-events-none" : "")} onClick={() => updateUrl("page", String(page))}>{page}</Button>))}
+          <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateUrl("page", String(meta.page + 1))} disabled={meta.page >= meta.totalPage}><ChevronRight className="h-4 w-4" /></Button>
         </div>
       </div>
+
+      {/* Modals */}
+      <MedicineDetailsModal 
+        medicine={selectedMedicine} 
+        open={isViewOpen} 
+        onOpenChange={setIsViewOpen} 
+      />
+
+      <EditMedicineModal
+        medicine={selectedMedicine} 
+        open={isEditOpen} 
+        onOpenChange={setIsEditOpen} 
+      />
+
+      <AlertDialog open={!!medicineToDelete} onOpenChange={(open) => !open && setMedicineToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the medicine.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700 text-white">Delete Item</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </div>
   );
 }
