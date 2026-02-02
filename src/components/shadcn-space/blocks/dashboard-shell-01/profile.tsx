@@ -15,9 +15,14 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, Mail, MapPin, Phone, User, Save, ShieldCheck, CreditCard } from "lucide-react";
+import { 
+  Camera, Mail, MapPin, Phone, User, Save, 
+  ShieldCheck, CreditCard, CheckCircle2, 
+  KeyRound, BellRing, UserCheck 
+} from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 
 interface ProfileBlockProps {
   user: {
@@ -25,179 +30,208 @@ interface ProfileBlockProps {
     email: string;
     image?: string | null;
     role: string;
-    phone?: string;   
-    address?: string; 
   };
 }
 
 export default function ProfileBlock({ user }: ProfileBlockProps) {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSave = async () => {
-    setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    setIsLoading(false);
-  };
-
   return (
-    <div className="space-y-6">
-      {/* 1. Header Section */}
-      <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
-        <div className="space-y-1">
-          <h2 className="text-3xl font-bold tracking-tight">Account Settings</h2>
-          <p className="text-muted-foreground">
-            Manage your personal information and shipping details.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-           {/* Role Badge */}
-           <Badge variant="secondary" className="text-sm px-3 py-1 capitalize">
-              {user.role.toLowerCase()} Account
-           </Badge>
+    <div className="max-w-6xl mx-auto pb-20 animate-in fade-in duration-500">
+      
+      {/* 1. HERO / COVER SECTION */}
+      <div className="relative mb-20">
+        <div className="h-48 w-full rounded-xl bg-gradient-to-r from-primary/20 via-blue-500/10 to-purple-500/20 border border-border/50" />
+        
+        <div className="absolute -bottom-12 left-8 flex flex-col md:flex-row items-end gap-6">
+          <div className="relative group">
+            <Avatar className="h-32 w-32 border-4 border-background shadow-2xl transition-transform group-hover:scale-[1.02]">
+              <AvatarImage src={user.image || ""} className="object-cover" />
+              <AvatarFallback className="text-4xl font-bold bg-muted">{user.name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <Button size="icon" className="absolute bottom-1 right-1 h-9 w-9 rounded-full shadow-lg">
+              <Camera className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <div className="pb-2 space-y-1">
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold tracking-tight">{user.name}</h1>
+              <Badge className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 capitalize py-0.5">
+                {user.role.toLowerCase()}
+              </Badge>
+            </div>
+            <p className="text-muted-foreground flex items-center gap-2">
+              <Mail className="h-3.5 w-3.5" /> {user.email}
+            </p>
+          </div>
         </div>
       </div>
 
-      <Separator />
-
-      {/* 2. Main Layout with Tabs */}
-      <Tabs defaultValue="general" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 max-w-[400px] mb-4">
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="shipping">Shipping</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
-        </TabsList>
-
-        {/* --- TAB: GENERAL --- */}
-        <TabsContent value="general">
-          <div className="grid gap-6 md:grid-cols-[250px_1fr]">
-            {/* Left: Avatar Card */}
-            <Card>
-              <CardContent className="pt-6 flex flex-col items-center text-center gap-4">
-                <div className="relative group">
-                   <Avatar className="h-32 w-32 border-4 border-background shadow-xl">
-                    <AvatarImage src={user.image || ""} className="object-cover" />
-                    <AvatarFallback className="text-4xl">{user.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  {/* Upload Button Overlay */}
-                  <div className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-2 rounded-full cursor-pointer hover:bg-primary/90 transition-colors shadow-sm">
-                    <Camera className="h-4 w-4" />
-                  </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-12">
+        
+        {/* 2. SIDEBAR INFO */}
+        <div className="lg:col-span-4 space-y-6">
+          <Card className="shadow-sm border-border/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Profile Completion</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between text-sm mb-1">
+                <span className="font-medium">85% Complete</span>
+                <span className="text-muted-foreground">Almost there!</span>
+              </div>
+              <Progress value={85} className="h-2" />
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center gap-2 text-sm text-emerald-600">
+                  <CheckCircle2 className="h-4 w-4" /> Email Verified
                 </div>
-                <div>
-                  <h3 className="font-semibold text-lg">{user.name}</h3>
-                  <p className="text-sm text-muted-foreground">{user.email}</p>
+                <div className="flex items-center gap-2 text-sm text-emerald-600">
+                  <CheckCircle2 className="h-4 w-4" /> Account Secured
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Right: Form */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Personal Information</CardTitle>
-                <CardDescription>
-                  Update your public profile and contact details.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input id="name" defaultValue={user.name} className="pl-9" />
-                  </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground opacity-60">
+                  <div className="h-4 w-4 rounded-full border-2 border-muted" /> Add Phone Number
                 </div>
-                
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input id="email" defaultValue={user.email} className="pl-9 bg-muted" disabled />
-                  </div>
-                  <p className="text-[10px] text-muted-foreground">
-                    Contact support to change your email.
-                  </p>
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input id="phone" placeholder="+880 1..." className="pl-9" />
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter className="justify-end border-t bg-muted/50 p-4">
-                 <Button onClick={handleSave} disabled={isLoading}>
-                    {isLoading ? "Saving..." : "Save Changes"}
-                 </Button>
-              </CardFooter>
-            </Card>
-          </div>
-        </TabsContent>
-
-        {/* --- TAB: SHIPPING --- */}
-        <TabsContent value="shipping">
-           <Card>
-              <CardHeader>
-                <CardTitle>Shipping Address</CardTitle>
-                <CardDescription>
-                  This address will be used as the default for all your orders.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                 <div className="grid gap-2">
-                    <Label>Street Address</Label>
-                    <div className="relative">
-                       <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                       <Textarea className="min-h-[100px] pl-9 pt-2" placeholder="123 Main St, Apt 4B" />
-                    </div>
-                 </div>
-                 <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-2">
-                       <Label>City</Label>
-                       <Input placeholder="Dhaka" />
-                    </div>
-                    <div className="grid gap-2">
-                       <Label>Postal Code</Label>
-                       <Input placeholder="1212" />
-                    </div>
-                 </div>
-              </CardContent>
-              <CardFooter className="justify-end border-t bg-muted/50 p-4">
-                 <Button onClick={handleSave}>Save Address</Button>
-              </CardFooter>
-           </Card>
-        </TabsContent>
-
-        {/* --- TAB: SECURITY --- */}
-        <TabsContent value="security">
-          <Card>
-             <CardHeader>
-                <CardTitle>Security Settings</CardTitle>
-                <CardDescription>Manage your password and account security.</CardDescription>
-             </CardHeader>
-             <CardContent className="space-y-4">
-                <div className="grid gap-2">
-                   <Label>Current Password</Label>
-                   <Input type="password" />
-                </div>
-                <div className="grid gap-2">
-                   <Label>New Password</Label>
-                   <Input type="password" />
-                </div>
-                <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground bg-blue-50 dark:bg-blue-900/20 p-3 rounded-md border border-blue-100 dark:border-blue-900">
-                    <ShieldCheck className="h-4 w-4 text-blue-500" />
-                    <span>Two-factor authentication is currently disabled.</span>
-                </div>
-             </CardContent>
-             <CardFooter className="justify-end border-t bg-muted/50 p-4">
-                <Button variant="secondary">Update Password</Button>
-             </CardFooter>
+              </div>
+            </CardContent>
           </Card>
-        </TabsContent>
 
-      </Tabs>
+          <Card className="bg-primary/[0.02] border-primary/10">
+            <CardContent className="pt-6 space-y-4">
+              <div className="flex items-center gap-3">
+                 <div className="p-2 bg-primary/10 rounded-lg">
+                    <UserCheck className="h-5 w-5 text-primary" />
+                 </div>
+                 <div className="text-sm font-medium">Verified Identity</div>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Your identity has been verified as a {user.role.toLowerCase()} on Medicine Corner. This builds trust with our community.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* 3. MAIN FORM CONTENT */}
+        <div className="lg:col-span-8">
+          <Tabs defaultValue="general" className="w-full space-y-6">
+            <div className="flex items-center justify-between">
+              <TabsList className="bg-muted/50 p-1 border">
+                <TabsTrigger value="general" className="gap-2">
+                  <User className="h-3.5 w-3.5" /> General
+                </TabsTrigger>
+                <TabsTrigger value="shipping" className="gap-2">
+                  <MapPin className="h-3.5 w-3.5" /> Shipping
+                </TabsTrigger>
+                <TabsTrigger value="security" className="gap-2">
+                  <KeyRound className="h-3.5 w-3.5" /> Security
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            {/* --- TAB: GENERAL --- */}
+            <TabsContent value="general" className="space-y-6">
+              <Card className="shadow-sm border-border/50">
+                <CardHeader>
+                  <CardTitle>Personal Details</CardTitle>
+                  <CardDescription>Manage your primary contact information.</CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-6">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input id="name" defaultValue={user.name} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Phone Number</Label>
+                      <Input id="phone" placeholder="+880 1XXX-XXXXXX" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email Address</Label>
+                    <Input id="email" defaultValue={user.email} disabled className="bg-muted/50" />
+                    <p className="text-[11px] text-muted-foreground italic px-1">
+                      Verified email cannot be changed directly.
+                    </p>
+                  </div>
+                </CardContent>
+                <CardFooter className="bg-muted/30 border-t justify-end py-3">
+                   <Button className="gap-2 shadow-sm">
+                      <Save className="h-4 w-4" /> Save Profile
+                   </Button>
+                </CardFooter>
+              </Card>
+            </TabsContent>
+
+            {/* --- TAB: SHIPPING --- */}
+            <TabsContent value="shipping">
+              <Card className="shadow-sm border-border/50">
+                <CardHeader>
+                  <CardTitle>Default Shipping Address</CardTitle>
+                  <CardDescription>Set your primary location for fast checkouts.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-2">
+                    <Label>Street Address</Label>
+                    <Textarea className="min-h-[100px] bg-muted/20" placeholder="123 Road, Area, House No..." />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>City</Label>
+                      <Input placeholder="e.g. Dhaka" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Postal Code</Label>
+                      <Input placeholder="e.g. 1212" />
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter className="bg-muted/30 border-t justify-end py-3">
+                   <Button variant="outline" className="gap-2">
+                      <Save className="h-4 w-4" /> Update Address
+                   </Button>
+                </CardFooter>
+              </Card>
+            </TabsContent>
+
+            {/* --- TAB: SECURITY --- */}
+            <TabsContent value="security" className="space-y-6">
+              <Card className="shadow-sm border-border/50">
+                <CardHeader>
+                  <CardTitle>Password Management</CardTitle>
+                  <CardDescription>We recommend changing your password every 6 months.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-2">
+                    <Label>Current Password</Label>
+                    <Input type="password" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>New Password</Label>
+                    <Input type="password" />
+                  </div>
+                </CardContent>
+                <CardFooter className="bg-muted/30 border-t justify-end py-3 text-right">
+                  <Button variant="secondary" className="gap-2">Update Security</Button>
+                </CardFooter>
+              </Card>
+
+              <Card className="border-blue-100 bg-blue-50/50 dark:bg-blue-950/20 dark:border-blue-900/50 shadow-none">
+                 <CardContent className="pt-6 flex items-start gap-4">
+                    <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-full">
+                       <BellRing className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div className="space-y-1">
+                       <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100">Security Notification</h4>
+                       <p className="text-xs text-blue-700/80 dark:text-blue-300/80 leading-relaxed">
+                          Your last password change was 3 months ago. Enabling 2FA (Two-Factor Authentication) will significantly improve your account safety.
+                       </p>
+                    </div>
+                 </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
     </div>
   );
 }
