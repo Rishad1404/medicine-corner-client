@@ -12,3 +12,7 @@ export const createMedicine=async(data:Medicine)=>{
 
     return res;
 }
+
+export const getSellerMedicines=async()=>{
+    return await medicineService.getSellerMedicines();
+}

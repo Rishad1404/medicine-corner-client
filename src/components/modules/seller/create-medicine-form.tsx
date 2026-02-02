@@ -93,14 +93,15 @@ export function CreateMedicineForm({ categories }: CreateMedicineFormProps) {
       };
 
       try {
-        const res=await createMedicine(medicineData)
-        if(res.error){
-            toast.error(res.error.message, { id: toastId });
-        }
+        const res=await createMedicine(medicineData);
 
         toast.success("Medicine created successfully", { id: toastId });
         router.push("/seller/medicines");
-        router.refresh();
+
+        if(res.error){
+            toast.error(res.error.message, { id: toastId });
+        }
+        
       } catch (err) {
         toast.error("Something went wrong", { id: toastId });
       }

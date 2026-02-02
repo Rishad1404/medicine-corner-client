@@ -28,7 +28,6 @@ const { data } = await authClient.getSession({
     return redirect("/login");
   }
 
-  // 4. Extract and Normalize Data
  const user=data.user
   const role = (user as any).role.toUpperCase();
 

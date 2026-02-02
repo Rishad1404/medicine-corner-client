@@ -57,7 +57,33 @@ export const medicineService = {
     } catch (error) {
       return {data:null,error:{message:"Something Went Wrong"}}
     }
-  }
+  },
 
+  getSellerMedicines: async function () {
+    try {
+      const cookieStore = await cookies();
+
+      const res = await fetch(`${API_URL}/seller/medicines`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: cookieStore.toString(),
+        },
+        cache: "no-store", 
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch medicines");
+      }
+
+      const response = await res.json();
+      
+      return { data: response.data || [], error: null };
+    } catch (error) {
+      console.log("Service Error:", error);
+      return { data: [], error: { message: "Something went wrong" } };
+    }
+  },
+  
 
 };

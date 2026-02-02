@@ -27,8 +27,6 @@ export function SiteHeader() {
       <div className="flex items-center gap-3">
         <UserDropdown
           user={user as any}
-          defaultOpen={false}
-          align="center"
           trigger={
             <div className="rounded-full">
               <Avatar className="size-8 cursor-pointer">

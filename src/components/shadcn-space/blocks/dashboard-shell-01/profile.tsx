@@ -36,7 +36,7 @@ export default function ProfileBlock({ user }: ProfileBlockProps) {
   const handleSave = async () => {
     setIsLoading(true);
     // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 500));
     setIsLoading(false);
   };
 
