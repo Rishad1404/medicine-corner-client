@@ -1,4 +1,3 @@
-
 "use server";
 
 import { categoryService } from "@/app/services/category.service";
@@ -34,17 +33,18 @@ export const deleteCategoryAction = async (id: string) => {
   }
 };
 
+
 export const updateCategoryAction = async (id: string, data: { name: string; image?: string }) => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    const result = await res.json();
-    if (result.success) revalidatePath("/admin/categories");
+
+    const result = await categoryService.updateCategory(id, data);
+    
+    if (result.success) {
+      revalidatePath("/admin/categories");
+    }
+    
     return result;
   } catch (error) {
-    return { success: false, message: "Update failed" };
+    return { success: false, message: "Update synchronization failed" };
   }
 };
