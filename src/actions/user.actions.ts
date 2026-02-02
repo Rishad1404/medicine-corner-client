@@ -26,7 +26,7 @@ export const deleteUserAction = async (userId: string) => {
     const result = await userService.deleteUser(userId);
     
     if (result.success) {
-      // THIS IS THE FIX: It clears the cache for the admin users page
+
       revalidatePath("/admin/users"); 
       return { success: true };
     }
