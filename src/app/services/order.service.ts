@@ -84,7 +84,7 @@ export const orderService = {
 
   getCustomerOrders: async () => {
     const cookieStore = await cookies();
-    
+
     const res = await fetch(`${API_URL}/orders`, {
       method: "GET",
       headers: {
@@ -92,7 +92,40 @@ export const orderService = {
       },
       cache: "no-store",
     });
-    
+
     return await res.json();
+  },
+
+createOrder: async (orderData: any, token?: string) => {
+    try {
+      const res = await fetch(`${API_URL}/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // STRATEGY 1: Standard Bearer Token
+          Authorization: `Bearer ${token}`, 
+          
+          // STRATEGY 2: Forward it as a Cookie (Better Auth often needs this!)
+          Cookie: `better-auth.session_token=${token}`,
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      const result = await res.json();
+      
+      if (!res.ok) {
+        // Log the actual error from the backend to understand WHY it failed
+        console.error("Backend Error Response:", result);
+        throw new Error(result.message || "Server rejected the request");
+      }
+
+      return result;
+    } catch (error: any) {
+      console.error("Order Service Error:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to place order",
+      };
+    }
   },
 };
