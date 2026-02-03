@@ -41,3 +41,21 @@ export const updateMedicineServerAction = async (id: string, data: any) => {
   }
   return result;
 };
+
+export const getMedicines = async (
+  searchParams: { [key: string]: string | string[] | undefined }
+) => {
+  const query: Record<string, any> = {
+    search: (searchParams.search as string) || "",
+    category: (searchParams.category as string) || "",
+    minPrice: (searchParams.minPrice as string) || "",
+    maxPrice: (searchParams.maxPrice as string) || "",
+    page: (searchParams.page as string) || "1",
+    limit: (searchParams.limit as string) || "12",
+    sortBy: (searchParams.sortBy as string) || "price",
+    sortOrder: (searchParams.sortOrder as string) || "asc",
+  };
+
+  const result = await medicineService.getFilteredMedicines(query);
+  return result;
+};

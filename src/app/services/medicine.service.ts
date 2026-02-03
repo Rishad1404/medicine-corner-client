@@ -173,7 +173,7 @@ export const medicineService = {
   },
 
   getAllMedicines: async (search?: string, category?: string) => {
-   try {
+    try {
       const params = new URLSearchParams();
       if (search) params.append("searchTerm", search);
       if (category) params.append("category", category);
@@ -184,11 +184,36 @@ export const medicineService = {
       });
 
       const result = await res.json();
-      
 
-      return result; 
+      return result;
     } catch (error) {
       return { data: [], error };
+    }
+  },
+
+  getFilteredMedicines: async (query: Record<string, any> = {}) => {
+    try {
+      const params = new URLSearchParams();
+
+      if (query.search) params.append("search", query.search);
+      if (query.category) params.append("category", query.category);
+      if (query.minPrice) params.append("minPrice", query.minPrice);
+      if (query.maxPrice) params.append("maxPrice", query.maxPrice);
+      if (query.page) params.append("page", query.page);
+      if (query.limit) params.append("limit", query.limit);
+      if (query.sortBy) params.append("sortBy", query.sortBy);
+      if (query.sortOrder) params.append("sortOrder", query.sortOrder);
+
+      const res = await fetch(`${API_URL}/medicines?${params.toString()}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+      });
+
+      return await res.json();
+    } catch (error: any) {
+      console.error("Error in getFilteredMedicines:", error);
+      return { data: [], meta: { page: 1, total: 0 } };
     }
   },
 };

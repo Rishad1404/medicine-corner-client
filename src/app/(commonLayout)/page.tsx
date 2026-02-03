@@ -21,10 +21,11 @@ export default async function Home() {
     <main className="space-y-20 pb-20">
 
       <HeroSection />
+      
+      <FeaturedShop medicines={medicinesData} />
 
       <CategoryGrid categories={categories} />
 
-      <FeaturedShop medicines={medicinesData} />
 
       <TrustBar />
 
