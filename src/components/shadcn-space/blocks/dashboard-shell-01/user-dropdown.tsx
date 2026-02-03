@@ -84,7 +84,7 @@ export default function UserDropdown({ user, trigger }: UserDropdownProps) {
           {/* 🔵 SCENARIO 2: SELLER & ADMIN */}
           {(isSeller || isAdmin) && (
             <DropdownMenuItem asChild>
-              <Link href={`/dashboard/${user.role.toLowerCase()}`} className="cursor-pointer">
+              <Link href={`/${user.role.toLowerCase()}`} className="cursor-pointer">
                 <LayoutDashboard className="mr-2 h-4 w-4" />
                 <span>Dashboard</span>
               </Link>

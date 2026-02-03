@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { userService } from "./app/services/user.service";
-import { Roles } from "./constants/roles";
+import { userService } from "./src/app/services/user.service";
+import { Roles } from "./src/constants/roles";
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -22,7 +22,7 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  else if (role === Roles.seller) { // Assuming you have Roles.seller
+  else if (role === Roles.seller) { 
 
     if (!pathname.startsWith("/seller")) {
       return NextResponse.redirect(new URL("/seller", request.url));
