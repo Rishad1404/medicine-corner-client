@@ -3,11 +3,12 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
+import { CartProvider } from "@/context/CartContext"; 
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"], // Select weights you need
-  variable: "--font-poppins", // Optional: for Tailwind
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins",
 });
 
 export const metadata: Metadata = {
@@ -30,10 +31,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
 
-
-          <main className="grow">{children}</main>
-          <Toaster richColors position="top-right"/>
-
+          <CartProvider>
+             <main className="grow">{children}</main>
+             <Toaster richColors position="top-right"/>
+          </CartProvider>
 
         </ThemeProvider>
       </body>

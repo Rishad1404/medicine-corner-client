@@ -7,6 +7,7 @@ import { ShoppingCart, Eye, PackageCheck, Heart, Factory } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/context/CartContext"; // <--- 1. IMPORT HOOK
 
 interface ProductCardProps {
   product: any;
@@ -16,6 +17,9 @@ export function ProductCard({ product }: ProductCardProps) {
   const [imgError, setImgError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  
+  // 2. GET ADD TO CART FUNCTION
+  const { addToCart } = useCart();
 
   useEffect(() => {
     setImgError(false);
@@ -25,6 +29,13 @@ export function ProductCard({ product }: ProductCardProps) {
   const manufacturer = product.manufacturer || "Generic";
   const categoryName = product.category?.name || product.category || "";
   const displayCategory = categoryName.length < 20 ? categoryName : ""; 
+
+  // 3. HANDLE ADD TO CART CLICK
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigating to details page if wrapped in Link
+    e.stopPropagation();
+    addToCart(product, 1); // Add 1 item
+  };
 
   return (
     <div
@@ -39,9 +50,14 @@ export function ProductCard({ product }: ProductCardProps) {
           {/* Top Badges */}
           <div className="absolute top-4 left-4 right-4 z-30 flex justify-between items-start pointer-events-none">
             <div className="flex flex-col gap-2">
-              {product.stock < 5 && (
+              {product.stock < 5 && product.stock > 0 && (
                 <Badge variant="destructive" className="bg-red-500/90 backdrop-blur-sm text-white border-none shadow-sm text-[10px] font-bold uppercase tracking-wider px-3 py-1">
                   Low Stock
+                </Badge>
+              )}
+              {product.stock === 0 && (
+                <Badge variant="secondary" className="bg-slate-900/90 text-white border-none shadow-sm text-[10px] font-bold uppercase tracking-wider px-3 py-1">
+                   Out of Stock
                 </Badge>
               )}
             </div>
@@ -135,7 +151,9 @@ export function ProductCard({ product }: ProductCardProps) {
 
           <Button
             size="icon"
-            className="h-12 w-12 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-indigo-600 hover:dark:bg-indigo-600 hover:dark:text-white shadow-lg shadow-slate-900/10 dark:shadow-none transition-all duration-300 hover:scale-105 active:scale-95"
+            onClick={handleAddToCart} // <--- 4. ATTACH HANDLER
+            disabled={product.stock === 0}
+            className="h-12 w-12 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-indigo-600 hover:dark:bg-indigo-600 hover:dark:text-white shadow-lg shadow-slate-900/10 dark:shadow-none transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Add to cart"
           >
             <ShoppingCart className="h-5 w-5" />

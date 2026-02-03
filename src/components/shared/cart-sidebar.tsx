@@ -1,190 +1,159 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { ShoppingCartIcon, Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
-
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ShoppingCart, Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useCart } from "@/context/CartContext";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 
 export function CartSidebar() {
-  // Dummy Data
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Napa Extra Pain Reliever",
-      price: 2.50,
-      quantity: 2,
-      image: "/logo.png",
-      category: "Medicine" // Added a category for better visuals
-    },
-    {
-      id: 2,
-      name: "Surgical Face Mask",
-      price: 12.00,
-      quantity: 1,
-      image: "/logo.png",
-      category: "Supplies"
-    },
-  ]);
-
-  // Calculate totals
-  const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const itemCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-  const shipping = 5.00;
-  const total = subtotal + shipping;
+  const { cart, cartTotal, removeFromCart, updateQuantity, cartCount } =
+    useCart();
 
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <div className='relative w-fit cursor-pointer hover:opacity-80 transition-opacity group'>
-          <div className="p-2 rounded-full group-hover:bg-muted transition-colors">
-             <ShoppingCartIcon className='size-6 text-foreground' />
-          </div>
-          {itemCount > 0 && (
-            <Badge className='absolute top-0 right-0 h-5 w-5 p-0 flex items-center justify-center rounded-full text-[10px] border-2 border-background'>
-              {itemCount}
-            </Badge>
+        {/* WRAPPER: relative allows absolute positioning of the badge */}
+        <div className="relative flex items-center justify-center w-10 h-10 rounded-full hover:bg-secondary/50 transition-colors cursor-pointer group">
+          
+          {/* ICON */}
+          <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+
+          {/* BADGE: Top-Right Corner */}
+          {cartCount > 0 && (
+            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground shadow-sm ring-2 ring-background animate-in zoom-in-50 duration-300">
+              {cartCount}
+            </span>
           )}
         </div>
       </SheetTrigger>
 
-      {/* h-full and flex-col ensures the footer stays at the bottom */}
-      <SheetContent className="w-full sm:max-w-md flex flex-col h-full p-0 gap-0 bg-background border-l shadow-2xl">
-        
+      <SheetContent
+        side="right"
+        className="w-full sm:max-w-md flex flex-col p-0 gap-0 border-l border-border bg-background"
+      >
         {/* HEADER */}
-        <SheetHeader className="px-6 py-4 border-b mt-5">
-          <SheetTitle className="flex items-center gap-2 text-lg">
-            <ShoppingBag className="size-5" />
+        <SheetHeader className="px-6 py-5 border-b border-border/60 bg-background/95 backdrop-blur-sm sticky top-0 z-10">
+          <SheetTitle className="flex items-center gap-2.5 text-lg font-bold tracking-tight">
+            <ShoppingBag className="h-5 w-5 text-primary" />
             Your Cart
-            <span className="ml-auto text-sm font-normal text-muted-foreground">
-              {itemCount} items
+            <span className="text-muted-foreground font-medium text-sm ml-auto">
+              {cartCount} {cartCount === 1 ? "item" : "items"}
             </span>
           </SheetTitle>
         </SheetHeader>
 
         {/* SCROLLABLE LIST */}
-        <ScrollArea className="flex-1 w-full">
-          {cartItems.length > 0 ? (
-            <div className="flex flex-col gap-0">
-              {cartItems.map((item) => (
-                <div key={item.id} className="flex gap-4 p-6 border-b hover:bg-muted/30 transition-colors">
-                  {/* Image */}
-                  <div className="h-20 w-20 relative shrink-0 rounded-lg overflow-hidden border bg-white shadow-sm">
-                    <Image 
-                      src={item.image} 
-                      alt={item.name} 
-                      fill 
-                      className="object-contain p-1"
+        <ScrollArea className="flex-1 px-6">
+          {cart.length > 0 ? (
+            <div className="py-6 space-y-6">
+              {cart.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex gap-4 group relative"
+                >
+                  {/* PRODUCT IMAGE */}
+                  <div className="h-24 w-24 shrink-0 bg-secondary/30 rounded-xl overflow-hidden relative border border-border/50">
+                    <Image
+                      src={item.image.replace("i.ibb.co.com", "i.ibb.co")}
+                      alt={item.name}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      sizes="96px"
                     />
                   </div>
-                  
-                  {/* Details */}
-                  <div className="flex flex-1 flex-col justify-between">
+
+                  {/* DETAILS */}
+                  <div className="flex-1 flex flex-col justify-between py-0.5">
                     <div className="space-y-1">
                       <div className="flex justify-between items-start gap-2">
-                        <h3 className="font-semibold text-sm line-clamp-2 leading-tight">
+                        <h4 className="font-semibold text-sm leading-tight text-foreground line-clamp-2">
                           {item.name}
-                        </h3>
-                        <p className="font-bold text-sm shrink-0">
-                          ${(item.price * item.quantity).toFixed(2)}
-                        </p>
+                        </h4>
+                        <button
+                          onClick={() => removeFromCart(item.id)}
+                          className="text-muted-foreground hover:text-destructive transition-colors -mt-0.5 p-1"
+                          aria-label="Remove item"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       </div>
-                      <p className="text-xs text-muted-foreground capitalize">
-                        {item.category}
+                      <p className="text-primary font-bold text-sm">
+                        ৳{(item.price * item.quantity).toLocaleString()}
                       </p>
                     </div>
-                    
-                    {/* Controls */}
-                    <div className="flex items-center justify-between pt-2">
-                      <div className="flex items-center gap-3 border rounded-full px-2 py-0.5 bg-background shadow-sm">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-6 w-6 rounded-full hover:bg-muted text-muted-foreground"
+
+                    {/* QUANTITY CONTROLS */}
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center border border-border rounded-lg bg-background shadow-sm h-8">
+                        <button
+                          onClick={() => updateQuantity(item.id, "minus")}
+                          className="w-8 h-full flex items-center justify-center hover:bg-secondary/80 text-muted-foreground transition-colors rounded-l-lg"
                         >
-                            <Minus className="h-3 w-3" />
-                        </Button>
-                        <span className="w-4 text-center text-sm font-medium tabular-nums">
+                          <Minus className="h-3 w-3" />
+                        </button>
+                        <Separator orientation="vertical" className="h-4 bg-border" />
+                        <span className="w-8 text-center text-xs font-semibold tabular-nums text-foreground">
                           {item.quantity}
                         </span>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-6 w-6 rounded-full hover:bg-muted text-foreground"
+                        <Separator orientation="vertical" className="h-4 bg-border" />
+                        <button
+                          onClick={() => updateQuantity(item.id, "plus")}
+                          className="w-8 h-full flex items-center justify-center hover:bg-secondary/80 text-muted-foreground transition-colors rounded-r-lg"
                         >
-                            <Plus className="h-3 w-3" />
-                        </Button>
+                          <Plus className="h-3 w-3" />
+                        </button>
                       </div>
-
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="h-full flex flex-col items-center justify-center space-y-4 p-8 text-center">
-              <div className="h-20 w-20 rounded-full bg-muted flex items-center justify-center">
-                <ShoppingCartIcon className="h-10 w-10 text-muted-foreground/50" />
+            <div className="h-full min-h-[50vh] flex flex-col items-center justify-center text-center space-y-4">
+              <div className="h-24 w-24 bg-secondary/30 rounded-full flex items-center justify-center animate-pulse">
+                <ShoppingBag className="h-10 w-10 text-muted-foreground/50" />
               </div>
               <div className="space-y-1">
-                <h3 className="font-semibold text-lg">Your cart is empty</h3>
+                <h3 className="font-semibold text-lg text-foreground">Your cart is empty</h3>
                 <p className="text-sm text-muted-foreground max-w-[200px] mx-auto">
-                  Looks like you haven't added anything to your cart yet.
+                  Looks like you haven't added any medicine yet.
                 </p>
               </div>
-              <Button asChild variant="outline" className="mt-4">
-                <Link href="/shop">Start Shopping</Link>
-              </Button>
             </div>
           )}
         </ScrollArea>
 
-        {/* FOOTER - SUMMARY */}
-        {cartItems.length > 0 && (
-          <div className="border-t bg-muted/20 p-6 space-y-4 shadow-[0_-5px_15px_rgba(0,0,0,0.02)]">
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between text-muted-foreground">
+        {/* FOOTER */}
+        {cart.length > 0 && (
+          <div className="p-6 bg-background border-t border-border z-10 space-y-4 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm text-muted-foreground">
                 <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>৳{cartTotal.toLocaleString()}</span>
               </div>
-              <div className="flex justify-between text-muted-foreground">
-                <span>Shipping</span>
-                <span>${shipping.toFixed(2)}</span>
-              </div>
-              <Separator className="my-2" />
-              <div className="flex justify-between text-base font-bold text-foreground">
-                <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+              <Separator />
+              <div className="flex justify-between items-end">
+                <span className="text-base font-semibold text-foreground">Total</span>
+                <span className="text-xl font-bold text-primary">৳{cartTotal.toLocaleString()}</span>
               </div>
             </div>
-            
-            <SheetFooter>
-              <Button className="w-full h-11 text-md shadow-lg" size="lg" asChild>
-                <Link href="/checkout">
-                  Proceed to Checkout
-                </Link>
-              </Button>
-            </SheetFooter>
+            <Button
+              className="w-full h-12 text-base font-semibold shadow-lg shadow-primary/10"
+              size="lg"
+              asChild
+            >
+              <Link href="/checkout">Proceed to Checkout</Link>
+            </Button>
           </div>
         )}
       </SheetContent>

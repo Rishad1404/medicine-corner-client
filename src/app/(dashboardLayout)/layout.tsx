@@ -34,7 +34,7 @@ const { data } = await authClient.getSession({
   return (
     <AppSidebar user={{ ...user, role }}>
       
-      {/* 5. Render Parallel Routes based on Role */}
+
       {role === "ADMIN" && admin}
 
       {role === "SELLER" && seller}
