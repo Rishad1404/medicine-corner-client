@@ -5,6 +5,7 @@ import { categoryService } from "../services/category.service";
 import { CategoryGrid } from "@/components/modules/home/category-grid";
 import { FeaturedShop } from "@/components/modules/home/featured-shop";
 import { TrustBar } from "@/components/modules/home/trust-bar";
+import FAQ from "@/components/faq";
 
 export default async function Home() {
 
@@ -26,10 +27,9 @@ export default async function Home() {
 
       <CategoryGrid categories={categories} />
 
-
       <TrustBar />
 
-
+      <FAQ/>
 
     </main>
   );
