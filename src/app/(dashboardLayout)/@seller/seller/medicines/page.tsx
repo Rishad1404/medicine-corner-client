@@ -1,4 +1,4 @@
-"use client"; // 👈 Keeps Auth working properly
+"use client"; 
 
 import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from "lucide-react";

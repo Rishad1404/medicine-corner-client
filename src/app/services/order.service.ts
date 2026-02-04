@@ -4,27 +4,29 @@ import { cookies } from "next/headers";
 const API_URL = env.API_URL;
 
 export const orderService = {
-  getSellerOrders: async function (page = 1, limit = 10) {
-    try {
-      const cookieStore = await cookies();
-      const res = await fetch(
-        `${API_URL}/seller/orders?page=${page}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Cookie: cookieStore.toString(),
-          },
-          next: { tags: ["orders"] },
-        },
-      );
+getSellerOrders: async function (page = 1, limit = 10) {
+  try {
+    const cookieStore = await cookies();
 
-      const response = await res.json();
-      return response;
-    } catch (error) {
-      return { success: false, message: "Failed to fetch orders" };
-    }
-  },
+    const res = await fetch(
+      `${API_URL}/seller/orders?page=${page}&limit=${limit}`,
+      {
+        method: "GET",
+        headers: {
+          Cookie: cookieStore.toString(),
+        },
+        credentials: "include",
+        next: { tags: ["orders"] },
+      }
+    );
+
+    const response = await res.json();
+
+    return response.data;
+  } catch (error) {
+    return [];
+  }
+},
 
   // 2. Update Order Status
   updateOrderStatus: async function (orderId: string, status: string) {

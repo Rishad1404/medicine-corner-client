@@ -62,8 +62,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { MedicineDetailsModal } from "./medicine-details-modal";
-
-import { deleteMedicine } from "@/actions/medicine.actions"; // Ensure this path is correct based on your folder structure
+import { deleteMedicine } from "@/actions/medicine.actions"; 
 import { EditMedicineModal } from "./edit-medicine-form";
 
 // --- 1. TYPES ---
@@ -92,10 +91,11 @@ interface MedicineTableProps {
   meta: Meta;
 }
 
+// 👇 FIXED: Uses opacity-based backgrounds (bg-red-500/10) so it works in Dark Mode too
 function StatusBadge({ stock }: { stock: number }) {
-  if (stock <= 0) return <Badge variant="outline" className="border-red-200 bg-red-50 text-red-700">Out of Stock</Badge>;
-  if (stock <= 5) return <Badge variant="outline" className="border-amber-200 bg-amber-50 text-amber-700">Low Stock</Badge>;
-  return <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700">In Stock ({stock})</Badge>;
+  if (stock <= 0) return <Badge variant="outline" className="border-red-200 dark:border-red-800 bg-red-500/10 text-red-700 dark:text-red-400">Out of Stock</Badge>;
+  if (stock <= 5) return <Badge variant="outline" className="border-amber-200 dark:border-amber-800 bg-amber-500/10 text-amber-700 dark:text-amber-400">Low Stock</Badge>;
+  return <Badge variant="outline" className="border-emerald-200 dark:border-emerald-800 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">In Stock ({stock})</Badge>;
 }
 
 export function MedicineTable({ data, meta }: MedicineTableProps) {
@@ -237,7 +237,7 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
               <DropdownMenuSeparator />
               
               <DropdownMenuItem 
-                className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer flex items-center"
+                className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/10 cursor-pointer flex items-center"
                 onClick={() => setMedicineToDelete(row.original.id)}
               >
                 <Trash2 className="mr-2 h-3.5 w-3.5" /> Delete
@@ -269,8 +269,8 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
 
   return (
     <div className="space-y-4">
-      {/* Toolbar */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-card rounded-lg p-4 border shadow-sm">
+      {/* Toolbar - Removed bg-card/border to make it transparent */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-1">
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <div className="relative w-full sm:w-[300px]">
              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -298,12 +298,12 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
+      {/* Table - Removed bg-card to make it transparent */}
+      <div className="rounded-lg border overflow-hidden">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="bg-muted/40 hover:bg-muted/40">
+              <TableRow key={headerGroup.id} className="bg-muted/50 hover:bg-muted/50">
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id} className="h-11 px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground/80">
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
@@ -326,8 +326,8 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
         </Table>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between border-t p-4 bg-card rounded-b-lg">
+      {/* Pagination - Removed bg-card/border to make it transparent */}
+      <div className="flex items-center justify-between p-4">
         <p className="text-sm text-muted-foreground">Showing <span className="font-medium text-foreground">{(meta.page - 1) * meta.limit + 1}</span> to <span className="font-medium text-foreground">{Math.min(meta.page * meta.limit, meta.total)}</span> of <span className="font-medium text-foreground">{meta.total}</span> entries</p>
         <div className="flex items-center gap-1.5">
           <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateUrl("page", String(meta.page - 1))} disabled={meta.page <= 1}><ChevronLeft className="h-4 w-4" /></Button>
