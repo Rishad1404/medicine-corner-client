@@ -5,11 +5,18 @@ import { Roles } from "./src/constants/roles";
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
+  
+  const sessionToken = request.cookies.get("better-auth.session_token") || request.cookies.get("__Secure-better-auth.session_token");
+
+  if (!sessionToken) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
 
   const { data } = await userService.getSession();
 
-
   if (!data) {
+    
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -20,18 +27,12 @@ export async function proxy(request: NextRequest) {
     if (!pathname.startsWith("/admin")) {
       return NextResponse.redirect(new URL("/admin", request.url));
     }
-  }
-
-  else if (role === Roles.seller) { 
-
+  } else if (role === Roles.seller) {
     if (!pathname.startsWith("/seller")) {
       return NextResponse.redirect(new URL("/seller", request.url));
     }
-  }
-
-
-  else {
-
+  } else {
+    
     if (pathname.startsWith("/admin") || pathname.startsWith("/seller")) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
@@ -46,7 +47,6 @@ export const config = {
     "/dashboard", 
     "/dashboard/:path*",
     
-
     "/admin", 
     "/admin/:path*",
 

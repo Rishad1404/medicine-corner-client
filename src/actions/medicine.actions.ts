@@ -18,7 +18,19 @@ export const createMedicine = async (data: Medicine) => {
 };
 
 export const getSellerMedicines = async () => {
-  return await medicineService.getSellerMedicines();
+  const res = await medicineService.getSellerMedicines();
+
+  if (res.error) {
+    return { 
+      success: false, 
+      message: res.error.message 
+    };
+  }
+
+  return { 
+    success: true, 
+    data: res.data 
+  };
 };
 
 export const deleteMedicine = async (id: string) => {

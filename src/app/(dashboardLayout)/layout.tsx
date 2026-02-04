@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
- // 1. Use Server Auth Instance
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import AppSidebar from "@/components/shadcn-space/blocks/dashboard-shell-01/app-sidebar";

@@ -5,29 +5,40 @@ const AUTH_URL = env.AUTH_URL;
 const API_URL = env.API_URL;
 
 export const userService = {
-  getSession: async function () {
-    try {
-      const cookieStore = await cookies();
+getSession: async function () {
+  try {
+    const cookieStore = await cookies();
 
-      const res = await fetch(`${AUTH_URL}/get-session`, {
-        headers: {
-          Cookie: cookieStore.toString(),
-        },
-        cache: "no-store",
-      });
 
-      const session = await res.json();
-
-      if (session === null) {
-        return { data: null, error: { message: "Session is missing" } };
-      }
-
-      return { data: session, error: null };
-    } catch (error) {
-      console.log(error);
-      return { data: null, error: { message: "Something Went Wrong" } };
+    if (!AUTH_URL || !AUTH_URL.startsWith("http")) {
+      return { data: null, error: { message: "Configuration Error" } };
     }
-  },
+
+    const res = await fetch(`${AUTH_URL}/get-session`, {
+      headers: {
+        Cookie: cookieStore.toString(),
+      },
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      return { data: null, error: { message: "Failed to fetch session" } };
+    }
+    const session = await res.json();
+
+    if (!session) {
+      return { data: null, error: { message: "Session is missing" } };
+    }
+    return { data: session, error: null };
+    
+  } catch (error) {
+    return { data: null, error: { message: "Something Went Wrong" } };
+  }
+},
+
+
+
+
 
   getAllUsers: async function (page = 1, limit = 10) {
     const cookieStore = await cookies();

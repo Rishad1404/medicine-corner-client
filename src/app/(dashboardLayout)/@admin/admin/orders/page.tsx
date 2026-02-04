@@ -12,12 +12,11 @@ export default async function AllOrdersPage() {
   const response = await orderService.getAllOrders();
   const orders = response?.data || [];
 
-  // Filter for Delivered orders for the header stats
+
   const deliveredOrders = orders.filter(
     (o: any) => o.status === "DELIVERED"
   ).length;
   
-  // Calculate total revenue
   const totalRevenue = orders.reduce(
     (acc: number, o: any) => acc + o.totalAmount, 
     0

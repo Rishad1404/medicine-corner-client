@@ -56,6 +56,7 @@ export const orderService = {
             "Content-Type": "application/json",
             Cookie: cookieStore.toString(),
           },
+          credentials: "include",
           next: { tags: ["orders"] },
         },
       );

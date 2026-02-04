@@ -7,8 +7,9 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose, // 👈 Import this
 } from "@/components/ui/sheet";
-import { ShoppingCart, Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
+import { ShoppingCart, Trash2, Plus, Minus, ShoppingBag, X } from "lucide-react"; // 👈 Import 'X'
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
@@ -42,14 +43,22 @@ export function CartSidebar() {
         className="w-full sm:max-w-md flex flex-col p-0 gap-0 border-l border-border bg-background"
       >
         {/* HEADER */}
-        <SheetHeader className="px-6 py-5 border-b border-border/60 bg-background/95 backdrop-blur-sm sticky top-0 z-10">
+        <SheetHeader className="px-6 py-5 border-b border-border/60 bg-background/95 backdrop-blur-sm sticky top-0 z-10 flex flex-row items-center justify-between space-y-0">
           <SheetTitle className="flex items-center gap-2.5 text-lg font-bold tracking-tight">
             <ShoppingBag className="h-5 w-5 text-primary" />
             Your Cart
-            <span className="text-muted-foreground font-medium text-sm ml-auto">
+            <span className="text-muted-foreground font-medium text-sm ml-2">
               {cartCount} {cartCount === 1 ? "item" : "items"}
             </span>
           </SheetTitle>
+
+          {/* ❌ CLOSE BUTTON */}
+          <SheetClose asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-secondary">
+               <X className="h-4 w-4" />
+               <span className="sr-only">Close</span>
+            </Button>
+          </SheetClose>
         </SheetHeader>
 
         {/* SCROLLABLE LIST */}
@@ -147,13 +156,19 @@ export function CartSidebar() {
                 <span className="text-xl font-bold text-primary">৳{cartTotal.toLocaleString()}</span>
               </div>
             </div>
-            <Button
-              className="w-full h-12 text-base font-semibold shadow-lg shadow-primary/10"
-              size="lg"
-              asChild
-            >
-              <Link href="/checkout">Proceed to Checkout</Link>
-            </Button>
+            <div className="grid gap-2">
+                <Button
+                  className="w-full h-12 text-base font-semibold shadow-lg shadow-primary/10"
+                  size="lg"
+                  asChild
+                >
+                  <Link href="/checkout">Proceed to Checkout</Link>
+                </Button>
+                {/* Optional: Add a close button at bottom too for better UX on mobile */}
+                <SheetClose asChild>
+                    <Button variant="outline" className="w-full">Continue Shopping</Button>
+                </SheetClose>
+            </div>
           </div>
         )}
       </SheetContent>

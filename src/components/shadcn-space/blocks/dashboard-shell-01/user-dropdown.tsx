@@ -93,7 +93,7 @@ export default function UserDropdown({ user, trigger }: UserDropdownProps) {
 
           {/* ⚪ SHARED: Profile */}
           <DropdownMenuItem asChild>
-            <Link href={isCustomer ? "/profile" : "/dashboard/profile"} className="cursor-pointer">
+            <Link href="/profile" className="cursor-pointer">
               <UserIcon className="mr-2 h-4 w-4" />
               <span>Profile</span>
             </Link>

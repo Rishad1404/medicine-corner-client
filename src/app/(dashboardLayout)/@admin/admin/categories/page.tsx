@@ -1,4 +1,4 @@
-// src/app/admin/categories/page.tsx
+export const dynamic = "force-dynamic";
 import { categoryService } from "@/app/services/category.service";
 import { CategoryManagementTable } from "@/components/modules/admin/category-table";
 import { CategoryFormModal } from "@/components/modules/admin/create-category-modal";

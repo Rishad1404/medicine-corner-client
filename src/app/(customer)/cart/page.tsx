@@ -1,5 +1,6 @@
 "use client";
 
+import { useCart } from "@/context/CartContext"; // 1. Import the hook
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,47 +22,26 @@ import {
 import { Trash2, Minus, Plus, ShoppingBag, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 
 export default function CartPage() {
+  // 2. Access the live cart data and functions
+  const { cart, cartTotal, removeFromCart, updateQuantity } = useCart();
 
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Napa Extra",
-      company: "Beximco Pharma",
-      price: 2.50,
-      quantity: 2,
-      image:"/logo.png"
-    },
-    {
-      id: 2,
-      name: "Sergel 20mg",
-      company: "Healthcare",
-      price: 8.00,
-      quantity: 1,
-      image:"/logo.png"
-    },
-  ]);
+  // 3. Shipping logic (matches your checkout logic)
+  const shipping = 60.00; // You can make this dynamic based on city later if you wish
+  const total = cartTotal + (cart.length > 0 ? shipping : 0);
 
-  const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const shipping = 2.00;
-  const total = subtotal + shipping;
-
-  // Simple handler to remove item
-  const removeItem = (id: number) => {
-    setCartItems(cartItems.filter((item) => item.id !== id));
-  };
-
-  if (cartItems.length === 0) {
+  if (cart.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
-        <div className="p-6 bg-muted rounded-full">
-          <ShoppingBag className="h-12 w-12 text-muted-foreground" />
+        <div className="p-6 bg-slate-100 rounded-full">
+          <ShoppingBag className="h-12 w-12 text-slate-400" />
         </div>
         <h2 className="text-2xl font-bold tracking-tight">Your cart is empty</h2>
-        <p className="text-muted-foreground">Looks like you haven't added any medicine yet.</p>
-        <Button asChild>
+        <p className="text-slate-500 text-center max-w-xs">
+          Looks like you haven't added any medicine to your cart yet.
+        </p>
+        <Button asChild className="bg-slate-900">
           <Link href="/shop">Start Shopping</Link>
         </Button>
       </div>
@@ -69,64 +49,83 @@ export default function CartPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold tracking-tight">Shopping Cart</h1>
+    <div className="max-w-[1200px] mx-auto py-10 px-4 space-y-8">
+      <div>
+        <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">
+          Shopping Cart
+        </h1>
+        <p className="text-slate-500 text-sm mt-1">Review your items before proceeding to checkout.</p>
+      </div>
 
       <div className="grid gap-8 lg:grid-cols-3">
         {/* LEFT SIDE: Cart Items Table */}
         <div className="lg:col-span-2">
-          <Card>
+          <Card className="border-slate-200 shadow-sm overflow-hidden">
             <CardContent className="p-0">
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[400px]">Product</TableHead>
-                    <TableHead className="text-center">Quantity</TableHead>
-                    <TableHead className="text-right">Price</TableHead>
-                    <TableHead className="text-right">Total</TableHead>
+                <TableHeader className="bg-slate-50/50">
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="w-[400px] font-bold text-slate-700">Product</TableHead>
+                    <TableHead className="text-center font-bold text-slate-700">Quantity</TableHead>
+                    <TableHead className="text-right font-bold text-slate-700">Price</TableHead>
+                    <TableHead className="text-right font-bold text-slate-700">Total</TableHead>
                     <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {cartItems.map((item) => (
-                    <TableRow key={item.id}>
+                  {cart.map((item) => (
+                    <TableRow key={item.id} className="group transition-colors">
                       <TableCell>
                         <div className="flex items-center gap-4">
-                          <div className="relative h-16 w-16 rounded-md overflow-hidden border bg-muted">
+                          <div className="relative h-20 w-20 rounded-xl overflow-hidden border border-slate-100 bg-slate-50">
                             <Image
-                              src={item.image}
+                              src={item.image.replace("i.ibb.co.com", "i.ibb.co")}
                               alt={item.name}
                               fill
-                              className="object-cover"
+                              className="object-contain p-2"
                             />
                           </div>
                           <div>
-                            <p className="font-medium">{item.name}</p>
-                            <p className="text-xs text-muted-foreground">{item.company}</p>
+                            <p className="font-bold text-slate-900">{item.name}</p>
+                            <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest">
+                               ৳{item.price} per unit
+                            </p>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center justify-center gap-2">
-                          <Button variant="outline" size="icon" className="h-8 w-8">
-                            <Minus className="h-3 w-3" />
-                          </Button>
-                          <span className="w-8 text-center text-sm">{item.quantity}</span>
-                          <Button variant="outline" size="icon" className="h-8 w-8">
-                            <Plus className="h-3 w-3" />
-                          </Button>
+                        <div className="flex items-center justify-center gap-3">
+                          <div className="flex items-center border border-slate-200 rounded-lg bg-slate-50 overflow-hidden">
+                            <button 
+                                onClick={() => updateQuantity(item.id, "minus")}
+                                className="px-2 py-1 hover:bg-slate-200 transition-colors"
+                            >
+                                <Minus className="h-3 w-3" />
+                            </button>
+                            <span className="w-8 text-center text-xs font-bold text-slate-900">
+                                {item.quantity}
+                            </span>
+                            <button 
+                                onClick={() => updateQuantity(item.id, "plus")}
+                                className="px-2 py-1 hover:bg-slate-200 transition-colors"
+                            >
+                                <Plus className="h-3 w-3" />
+                            </button>
+                          </div>
                         </div>
                       </TableCell>
-                      <TableCell className="text-right">${item.price.toFixed(2)}</TableCell>
-                      <TableCell className="text-right font-medium">
-                        ${(item.price * item.quantity).toFixed(2)}
+                      <TableCell className="text-right font-medium text-slate-600">
+                        ৳{item.price.toFixed(2)}
+                      </TableCell>
+                      <TableCell className="text-right font-black text-slate-900">
+                        ৳{(item.price * item.quantity).toFixed(2)}
                       </TableCell>
                       <TableCell>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                          onClick={() => removeItem(item.id)}
+                          className="text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all"
+                          onClick={() => removeFromCart(item.id)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -141,39 +140,41 @@ export default function CartPage() {
 
         {/* RIGHT SIDE: Order Summary */}
         <div className="lg:col-span-1">
-          <Card className="sticky top-20">
-            <CardHeader>
-              <CardTitle>Order Summary</CardTitle>
+          <Card className="sticky top-24 border-slate-200 shadow-xl overflow-hidden">
+            <CardHeader className="bg-slate-900 py-5">
+              <CardTitle className="text-white text-sm font-bold uppercase tracking-widest text-center">
+                Payment Summary
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 p-6">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span className="font-medium">${subtotal.toFixed(2)}</span>
+                <span className="text-slate-500">Subtotal</span>
+                <span className="font-bold text-slate-900">৳{cartTotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Shipping Estimate</span>
-                <span className="font-medium">${shipping.toFixed(2)}</span>
+                <span className="text-slate-500">Shipping (Estimate)</span>
+                <span className="font-bold text-slate-900">৳{shipping.toFixed(2)}</span>
               </div>
               
               <div className="py-2">
-                 <div className="flex gap-2">
-                    <Input placeholder="Coupon Code" />
-                    <Button variant="secondary">Apply</Button>
-                 </div>
+                  <div className="flex gap-2">
+                    <Input placeholder="Coupon Code" className="h-10 text-xs" />
+                    <Button variant="secondary" className="h-10 text-xs font-bold">Apply</Button>
+                  </div>
               </div>
 
-              <Separator />
+              <Separator className="bg-slate-100" />
               
-              <div className="flex justify-between text-lg font-bold">
-                <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+              <div className="flex justify-between items-center py-2">
+                <span className="text-lg font-bold text-slate-900">Grand Total</span>
+                <span className="text-2xl font-black text-emerald-600">৳{total.toFixed(2)}</span>
               </div>
             </CardContent>
             
-            <CardFooter>
-              <Button className="w-full" size="lg" asChild>
-                <Link href="/checkout" className="flex items-center gap-2">
-                  Proceed to Checkout <ArrowRight className="h-4 w-4" />
+            <CardFooter className="p-6 bg-slate-50">
+              <Button className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white font-bold uppercase tracking-wider shadow-lg" asChild>
+                <Link href="/checkout" className="flex items-center justify-center gap-2">
+                  Checkout Now <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
             </CardFooter>
