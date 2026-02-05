@@ -331,13 +331,13 @@ export function UserManagementTable({ data }: { data: UserData[] }) {
             <div className="text-center space-y-2">
               <AlertDialogTitle className="text-2xl font-black uppercase tracking-tight text-slate-900 dark:text-white">Confirm Removal</AlertDialogTitle>
               <AlertDialogDescription className="text-slate-500 font-medium px-4">
-                This will permanently de-authorize this user and purge all session data.
+                This will permanently de-authorize this user and delete all session data.
               </AlertDialogDescription>
             </div>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex gap-3 mt-6">
             <AlertDialogCancel className="flex-1 rounded-2xl border-2 font-bold hover:bg-slate-50">Abort</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="flex-1 rounded-2xl bg-rose-600 hover:bg-rose-700 font-bold shadow-lg shadow-rose-500/20">Purge Record</AlertDialogAction>
+            <AlertDialogAction onClick={confirmDelete} className="flex-1 rounded-2xl bg-rose-600 hover:bg-rose-700 font-bold shadow-lg shadow-rose-500/20">Delete User</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
