@@ -17,17 +17,16 @@ const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 w-full backdrop-blur-xl h-20 border-b bg-background/80">
-      {/* Added 'relative' here so we can absolute center the logo on mobile */}
       <div className="relative mx-auto flex h-full max-w-(--breakpoint-xl) items-center justify-between px-4 sm:px-6 lg:px-8">
         
         {/* --- LEFT SECTION --- */}
         <div className="flex items-center">
-            {/* 1. Mobile Menu (Hamburger) - Visible only on Mobile */}
+            {/* 1. Mobile Menu (Hamburger) */}
             <div className="md:hidden mr-2">
                 <NavigationSheet user={user}/>
             </div>
 
-            {/* 2. Desktop Logo - Hidden on Mobile */}
+            {/* 2. Desktop Logo */}
             <div className="hidden md:block">
                 <Logo />
             </div>
@@ -35,12 +34,14 @@ const Navbar = () => {
 
         {/* --- CENTER SECTION --- */}
         
-        {/* 3. Mobile Logo - Absolutely Centered */}
-        <div className="md:hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        {/* 3. Mobile Logo - Centered & Scaled Down */}
+        {/* Added 'scale-75' to make it smaller on mobile. 
+            This naturally increases the distance between the logo and the right-side icons. */}
+        <div className="md:hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 scale-75 origin-center">
             <Logo />
         </div>
 
-        {/* 4. Desktop Menu - Hidden on Mobile */}
+        {/* 4. Desktop Menu */}
         <NavMenu className="hidden md:block" />
 
 
@@ -57,7 +58,7 @@ const Navbar = () => {
                 user={user as any}
                 trigger={
                   <div className="rounded-full border shadow-sm cursor-pointer hover:opacity-80 transition-opacity">
-                    <Avatar className="size-8 sm:size-9"> {/* Made slightly smaller on mobile */}
+                    <Avatar className="size-8 sm:size-9">
                       <AvatarImage 
                         src={user.image || ""} 
                         alt={user.name || "User"} 
@@ -80,8 +81,6 @@ const Navbar = () => {
               </Button>
             </div>
           )}
-          
-          {/* Note: Removed NavigationSheet from here as it is now on the left */}
         </div>
       </div>
     </nav>
