@@ -19,15 +19,6 @@
 | **📂 Frontend Repo** | [https://github.com/Rishad1404/medicine-corner-client](https://github.com/Rishad1404/medicine-corner-client.git) |
 | **🗄️ Backend Repo** | [https://github.com/Rishad1404/medicine-corner-server](https://github.com/Rishad1404/medicine-corner-server.git) |
 
----
-
-## 📸 Project Screenshots
-
-| Customer Dashboard | Shop & Filters |
-|:---:|:---:|
-| ![Dashboard](https://via.placeholder.com/600x300?text=Upload+Your+Dashboard+Screenshot) | ![Shop](https://via.placeholder.com/600x300?text=Upload+Your+Shop+Screenshot) |
-
-*(Please update these image links with actual screenshots of your application)*
 
 ---
 
