@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏥 Medicine Corner
 
-## Getting Started
+![Project Status](https://img.shields.io/badge/Status-Live-success?style=flat-square&color=pink)
+![Next.js](https://img.shields.io/badge/Next.js-15.0-black?style=flat-square&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)
+![Tailwind CSS](https://img.shields.io/badge/Styling-Tailwind-38bdf8?style=flat-square&logo=tailwindcss)
+![ShadCN UI](https://img.shields.io/badge/UI-ShadCN-000000?style=flat-square)
 
-First, run the development server:
+> **Medicine Corner** is a robust, full-stack e-commerce platform designed to modernize the online pharmacy experience. It connects patients with essential medicines through a secure, high-performance interface, featuring real-time inventory tracking, verified patient reviews, and a comprehensive admin dashboard.
 
+---
+
+## 🔗 Important Links
+
+| Resource | URL |
+| :--- | :--- |
+| **🚀 Live Frontend** | [https://medicine-corner-client.vercel.app](https://medicine-corner-client.vercel.app) |
+| **⚙️ Live Backend** | [https://medicine-corner-server.vercel.app](https://medicine-corner-server.vercel.app) |
+| **📂 Frontend Repo** | [https://github.com/Rishad1404/medicine-corner-client](https://github.com/Rishad1404/medicine-corner-client.git) |
+| **🗄️ Backend Repo** | [https://github.com/Rishad1404/medicine-corner-server](https://github.com/Rishad1404/medicine-corner-server.git) |
+
+---
+
+## 📸 Project Screenshots
+
+| Customer Dashboard | Shop & Filters |
+|:---:|:---:|
+| ![Dashboard](https://via.placeholder.com/600x300?text=Upload+Your+Dashboard+Screenshot) | ![Shop](https://via.placeholder.com/600x300?text=Upload+Your+Shop+Screenshot) |
+
+*(Please update these image links with actual screenshots of your application)*
+
+---
+
+## ✨ Key Features
+
+### 🛍️ For Customers
+* **Smart Dashboard:** A personalized health hub showing total spend, active order tracking, and purchase history stats.
+* **Instant Filtering:** High-performance client-side filtering for medicines by Category, Price Range, and Brand without page reloads.
+* **Verified Reviews:** A security-first review system that allows only verified buyers of a specific medicine to leave feedback.
+* **Secure Checkout:** Seamless cart management and order placement.
+
+### 🛡️ For Admins
+* **Inventory Command Center:** Full control to add, edit, or delete medicines and categories.
+* **Order Management:** A detailed data table to track and update order statuses (Pending → Delivered).
+* **Real-time Insights:** Instant visibility into stock levels and sales performance.
+
+---
+
+## 🛠️ Technology Stack
+
+**Frontend:**
+* **Framework:** Next.js 15 (App Router)
+* **Language:** TypeScript
+* **Styling:** Tailwind CSS
+* **Components:** ShadCN UI (Radix Primitives)
+* **State Management:** React Hooks & TanStack Table
+* **Icons:** Lucide React
+
+**Backend:**
+* **Runtime:** Node.js
+* **Framework:** Express.js
+* **Database:** PostgreSQL
+* **ORM:** Prisma
+* **Authentication:** Better-Auth / JWT
+
+---
+
+## 🚀 Local Installation Guide
+
+Follow these steps to run the **Frontend** locally.
+
+### 1. Clone the Repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+git clone [https://github.com/Rishad1404/medicine-corner-client.git](https://github.com/Rishad1404/medicine-corner-client.git)
+cd medicine-corner-client
