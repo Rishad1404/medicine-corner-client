@@ -5,6 +5,8 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import {
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
+  getFilteredRowModel, 
   useReactTable,
   type ColumnDef,
   type SortingState,
@@ -17,9 +19,8 @@ import {
   MoreHorizontal,
   Search,
   Eye,
-  Filter,
+  ArrowUpDown, // Icon for sortable headers
 } from "lucide-react";
-import Link from "next/link";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -65,7 +66,7 @@ import { MedicineDetailsModal } from "./medicine-details-modal";
 import { deleteMedicine } from "@/actions/medicine.actions"; 
 import { EditMedicineModal } from "./edit-medicine-form";
 
-// --- 1. TYPES ---
+// --- TYPES ---
 export interface Medicine {
   id: string;
   name: string;
@@ -91,7 +92,6 @@ interface MedicineTableProps {
   meta: Meta;
 }
 
-// 👇 FIXED: Uses opacity-based backgrounds (bg-red-500/10) so it works in Dark Mode too
 function StatusBadge({ stock }: { stock: number }) {
   if (stock <= 0) return <Badge variant="outline" className="border-red-200 dark:border-red-800 bg-red-500/10 text-red-700 dark:text-red-400">Out of Stock</Badge>;
   if (stock <= 5) return <Badge variant="outline" className="border-amber-200 dark:border-amber-800 bg-amber-500/10 text-amber-700 dark:text-amber-400">Low Stock</Badge>;
@@ -103,27 +103,20 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   
+  // Local State for Client-Side features
   const [rowSelection, setRowSelection] = useState({});
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([]); // Sort state
+  const [globalFilter, setGlobalFilter] = useState(""); // Search state
 
   const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [medicineToDelete, setMedicineToDelete] = useState<string | null>(null);
 
-  const updateUrl = (key: string, value: string) => {
+  // Helper for Server-Side Pagination only
+  const updatePage = (newPage: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (value) params.set(key, value); else params.delete(key);
-    if (key !== "page") params.set("page", "1");
-    router.push(`${pathname}?${params.toString()}`);
-  };
-
-  const handleSort = (value: string) => {
-    const [sortBy, sortOrder] = value.split("-");
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("sortBy", sortBy);
-    params.set("sortOrder", sortOrder);
-    params.set("page", "1");
+    params.set("page", newPage);
     router.push(`${pathname}?${params.toString()}`);
   };
 
@@ -161,11 +154,22 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
         />
       ),
       enableSorting: false,
-      enableHiding: false,
     },
     {
       accessorKey: "name",
-      header: "Product Details",
+      // Sortable Header
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            className="p-0 hover:bg-transparent"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Product Details
+            <ArrowUpDown className="ml-2 h-3 w-3" />
+          </Button>
+        )
+      },
       cell: ({ row }) => (
         <div className="flex flex-col py-1">
           <span className="font-semibold text-sm text-foreground">{row.original.name}</span>
@@ -176,6 +180,7 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
     {
       accessorKey: "category",
       header: "Category",
+      // Custom filter function if needed, but default global filter works on string values
       cell: ({ row }) => (
          <span className="inline-flex items-center px-2 py-1 rounded-md bg-muted/50 text-xs font-medium text-muted-foreground ring-1 ring-inset ring-gray-500/10">
             {row.original.category?.name || "N/A"}
@@ -184,12 +189,36 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
     },
     {
       accessorKey: "stock",
-      header: "Status",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            className="p-0 hover:bg-transparent"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Status
+            <ArrowUpDown className="ml-2 h-3 w-3" />
+          </Button>
+        )
+      },
       cell: ({ row }) => <StatusBadge stock={row.getValue("stock")} />,
     },
     {
       accessorKey: "price",
-      header: () => <div className="text-right">Price</div>,
+      header: ({ column }) => {
+        return (
+          <div className="text-right">
+             <Button
+                variant="ghost"
+                className="p-0 hover:bg-transparent"
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              >
+                Price
+                <ArrowUpDown className="ml-2 h-3 w-3" />
+              </Button>
+          </div>
+        )
+      },
       cell: ({ row }) => (
         <div className="text-right font-medium font-mono text-sm">
            ৳{Number(row.getValue("price")).toLocaleString()}
@@ -211,33 +240,14 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
             <DropdownMenuContent align="end" className="w-[180px]">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              
-              <DropdownMenuItem 
-                className="cursor-pointer flex items-center"
-                onClick={() => {
-                   setSelectedMedicine(row.original);
-                   setIsViewOpen(true);
-                }}
-              >
+              <DropdownMenuItem onClick={() => { setSelectedMedicine(row.original); setIsViewOpen(true); }} className="cursor-pointer">
                  <Eye className="mr-2 h-3.5 w-3.5 text-muted-foreground" /> View Details
               </DropdownMenuItem>
-
-              <DropdownMenuItem 
-                 className="cursor-pointer flex items-center"
-                 onClick={() => {
-                   setSelectedMedicine(row.original);
-                   setIsEditOpen(true);
-                 }}
-              >
+              <DropdownMenuItem onClick={() => { setSelectedMedicine(row.original); setIsEditOpen(true); }} className="cursor-pointer">
                   <Pencil className="mr-2 h-3.5 w-3.5 text-muted-foreground" /> Edit Info
               </DropdownMenuItem>
-              
               <DropdownMenuSeparator />
-              
-              <DropdownMenuItem 
-                className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/10 cursor-pointer flex items-center"
-                onClick={() => setMedicineToDelete(row.original.id)}
-              >
+              <DropdownMenuItem onClick={() => setMedicineToDelete(row.original.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/10 cursor-pointer">
                 <Trash2 className="mr-2 h-3.5 w-3.5" /> Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -251,52 +261,82 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    manualPagination: true,
-    pageCount: meta.totalPage,
+    // Client-Side Sorting
+    getSortedRowModel: getSortedRowModel(),
+    onSortingChange: setSorting,
+    // Client-Side Filtering
+    getFilteredRowModel: getFilteredRowModel(),
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: "includesString", // Case-insensitive string search
     state: {
       pagination: { pageIndex: meta.page - 1, pageSize: meta.limit },
       sorting,
+      globalFilter,
       rowSelection,
     },
     onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
+    manualPagination: true, // We tell table we handle page count manually, but sort/filter happens on current data
+    pageCount: meta.totalPage,
   });
 
   const pageNumbers = Array.from({ length: meta.totalPage }, (_, i) => i + 1);
-  const currentSort = searchParams.get("sortBy") ? `${searchParams.get("sortBy")}-${searchParams.get("sortOrder")}` : "createdAt-desc";
 
   return (
     <div className="space-y-4">
-      {/* Toolbar - Removed bg-card/border to make it transparent */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-1">
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-          <div className="relative w-full sm:w-[300px]">
-             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-             <Input placeholder="Filter medicines..." defaultValue={searchParams.get("search") || ""} onChange={(e) => updateUrl("search", e.target.value)} className="pl-9 h-9 bg-background focus-visible:ring-1" />
-          </div>
-          <Select value={currentSort} onValueChange={(value) => handleSort(value)}>
-             <SelectTrigger className="w-full sm:w-[180px] h-9"><Filter className="mr-2 h-3.5 w-3.5 text-muted-foreground" /><SelectValue placeholder="Sort by" /></SelectTrigger>
-             <SelectContent>
-               <SelectItem value="createdAt-desc">Newest Added</SelectItem>
-               <SelectItem value="price-asc">Price: Low to High</SelectItem>
-               <SelectItem value="price-desc">Price: High to Low</SelectItem>
-               <SelectItem value="stock-asc">Stock: Low to High</SelectItem>
-             </SelectContent>
-           </Select>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground hidden sm:inline">Rows:</span>
-            <Select value={String(meta.limit)} onValueChange={(value) => updateUrl("limit", value)}>
-              <SelectTrigger className="h-9 w-[70px]"><SelectValue /></SelectTrigger>
-              <SelectContent>{[5, 10, 20, 50].map((size) => (<SelectItem key={size} value={String(size)}>{size}</SelectItem>))}</SelectContent>
+      {/* TOOLBAR: 
+        Left: Sort Dropdown (Optional, since headers are clickable now)
+        Right: Search Input (Moved here as requested)
+      */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-1 gap-4">
+        
+        {/* Left: Sort Selector (Manual control if user prefers dropdown over headers) */}
+        <div className="flex items-center gap-2">
+             <Select 
+                value={sorting[0]?.id ? `${sorting[0].id}-${sorting[0].desc ? 'desc' : 'asc'}` : ""} 
+                onValueChange={(val) => {
+                    const [id, dir] = val.split('-');
+                    setSorting([{ id, desc: dir === 'desc' }]);
+                }}
+             >
+              <SelectTrigger className="w-[180px] h-9 bg-background">
+                <SelectValue placeholder="Sort By..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="price-asc">Price: Low - High</SelectItem>
+                <SelectItem value="price-desc">Price: High - Low</SelectItem>
+                <SelectItem value="name-asc">Name: A - Z</SelectItem>
+                <SelectItem value="stock-asc">Stock: Low - High</SelectItem>
+              </SelectContent>
             </Select>
-          </div>
-          {Object.keys(rowSelection).length > 0 && (<div className="text-sm text-muted-foreground bg-muted/50 px-2 py-1 rounded">{Object.keys(rowSelection).length} selected</div>)}
+            {/* Clear Sort Button */}
+            {sorting.length > 0 && (
+                <Button variant="ghost" size="sm" onClick={() => setSorting([])} className="h-9 text-xs">
+                    Reset
+                </Button>
+            )}
+        </div>
+
+        {/* Right: Search Filter & Selection Count */}
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+             {Object.keys(rowSelection).length > 0 && (
+                <div className="text-sm text-muted-foreground bg-muted/50 px-2 py-1 rounded whitespace-nowrap">
+                    {Object.keys(rowSelection).length} selected
+                </div>
+             )}
+             
+             <div className="relative w-full sm:w-[250px]">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input 
+                    placeholder="Search visible items..." 
+                    value={globalFilter ?? ""}
+                    onChange={(e) => setGlobalFilter(e.target.value)}
+                    className="pl-9 h-9 bg-background focus-visible:ring-1" 
+                />
+             </div>
         </div>
       </div>
 
-      {/* Table - Removed bg-card to make it transparent */}
+      {/* Table */}
       <div className="rounded-lg border overflow-hidden">
         <Table>
           <TableHeader>
@@ -324,36 +364,28 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
         </Table>
       </div>
 
-      {/* Pagination - Removed bg-card/border to make it transparent */}
+      {/* Pagination (Server Side) */}
       <div className="flex items-center justify-between p-4">
-        <p className="text-sm text-muted-foreground">Showing <span className="font-medium text-foreground">{(meta.page - 1) * meta.limit + 1}</span> to <span className="font-medium text-foreground">{Math.min(meta.page * meta.limit, meta.total)}</span> of <span className="font-medium text-foreground">{meta.total}</span> entries</p>
+        <p className="text-sm text-muted-foreground">
+            Page <span className="font-medium text-foreground">{meta.page}</span> of <span className="font-medium text-foreground">{meta.totalPage}</span>
+        </p>
         <div className="flex items-center gap-1.5">
-          <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateUrl("page", String(meta.page - 1))} disabled={meta.page <= 1}><ChevronLeft className="h-4 w-4" /></Button>
-          {pageNumbers.slice(Math.max(0, meta.page - 3), meta.page + 2).map((page) => (<Button key={page} variant={meta.page === page ? "default" : "outline"} size="sm" className={cn("h-8 w-8 p-0", meta.page === page ? "pointer-events-none" : "")} onClick={() => updateUrl("page", String(page))}>{page}</Button>))}
-          <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateUrl("page", String(meta.page + 1))} disabled={meta.page >= meta.totalPage}><ChevronRight className="h-4 w-4" /></Button>
+          <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updatePage(String(meta.page - 1))} disabled={meta.page <= 1}><ChevronLeft className="h-4 w-4" /></Button>
+          {pageNumbers.slice(Math.max(0, meta.page - 3), meta.page + 2).map((page) => (
+             <Button key={page} variant={meta.page === page ? "default" : "outline"} size="sm" className={cn("h-8 w-8 p-0", meta.page === page ? "pointer-events-none" : "")} onClick={() => updatePage(String(page))}>{page}</Button>
+          ))}
+          <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updatePage(String(meta.page + 1))} disabled={meta.page >= meta.totalPage}><ChevronRight className="h-4 w-4" /></Button>
         </div>
       </div>
 
       {/* Modals */}
-      <MedicineDetailsModal 
-        medicine={selectedMedicine} 
-        open={isViewOpen} 
-        onOpenChange={setIsViewOpen} 
-      />
-
-      <EditMedicineModal
-        medicine={selectedMedicine} 
-        open={isEditOpen} 
-        onOpenChange={setIsEditOpen} 
-      />
-
+      <MedicineDetailsModal medicine={selectedMedicine} open={isViewOpen} onOpenChange={setIsViewOpen} />
+      <EditMedicineModal medicine={selectedMedicine} open={isEditOpen} onOpenChange={setIsEditOpen} />
       <AlertDialog open={!!medicineToDelete} onOpenChange={(open) => !open && setMedicineToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the medicine.
-            </AlertDialogDescription>
+            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>

@@ -72,7 +72,7 @@ export function CheckoutForm() {
     if (result?.success) {
       toast.success("Order placed successfully!");
       clearCart();
-      router.push("/profile");
+      router.push("/orders");
     } else {
       toast.error(result?.message || "Failed to place order");
     }
