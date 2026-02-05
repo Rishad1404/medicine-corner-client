@@ -7,14 +7,15 @@ import { revalidatePath } from "next/cache";
 export const createCategoryAction = async (data: { name: string; image?: string }) => {
   try {
     const result = await categoryService.createCategory(data);
-    
+
     if (result.success) {
       revalidatePath("/admin/categories");
     }
     
     return result;
-  } catch (error) {
-    return { success: false, message: "Network connection failed" };
+  } catch (error: any) {
+    console.error("Action Error:", error);
+    return { success: false, message: error.message || "Network connection failed" };
   }
 };
 

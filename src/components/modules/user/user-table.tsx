@@ -108,7 +108,7 @@ export function UserManagementTable({ data }: { data: UserData[] }) {
 
   const confirmDelete = async () => {
     if (!userToDelete) return;
-    const toastId = toast.loading("Purging user record...");
+    const toastId = toast.loading("Deleting user record...");
     try {
       const result = await deleteUserAction(userToDelete);
       if (result.success) {
@@ -116,7 +116,7 @@ export function UserManagementTable({ data }: { data: UserData[] }) {
         setUserToDelete(null); 
         router.refresh(); 
       } else {
-        toast.error(result.message || "Purge failed", { id: toastId });
+        toast.error(result.message || "Delete failed", { id: toastId });
       }
     } catch (err: any) {
       toast.error("An error occurred", { id: toastId });

@@ -74,10 +74,9 @@ export const medicineService = {
 
       const response = await res.json();
 
-      return { data: response.data || [], error: null };
+      return { data: response.data, error: null };
     } catch (error) {
-      console.log("Service Error:", error);
-      return { data: [], error: { message: "Something went wrong" } };
+      return { data: null, error: { message: "Something went wrong" } };
     }
   },
 

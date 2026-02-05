@@ -67,6 +67,12 @@ export default function UserDropdown({ user, trigger }: UserDropdownProps) {
           {isCustomer && (
             <>
               <DropdownMenuItem asChild>
+                <Link href="/dashboard" className="cursor-pointer">
+                  <Package className="mr-2 h-4 w-4" />
+                  <span>Dashboard</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
                 <Link href="/orders" className="cursor-pointer">
                   <Package className="mr-2 h-4 w-4" />
                   <span>My Orders</span>

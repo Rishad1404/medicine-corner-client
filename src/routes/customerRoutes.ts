@@ -1,8 +1,11 @@
 
 import { NavItem } from "@/types";
-import { CreditCard, Package, ShoppingCart, User } from "lucide-react";
+import { CreditCard, LayoutDashboard, Package, ShoppingCart, User } from "lucide-react";
 
 export const customerRoutes: NavItem[] = [
+
+  {title:"Dashboard",icon:LayoutDashboard,href:"/dashboard"},
+
   { label: "My Shopping", isSection: true },
   { title: "My Cart", icon: ShoppingCart, href: "/cart" },
 

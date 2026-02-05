@@ -84,7 +84,7 @@ export function ProductCard({ product }: ProductCardProps) {
               alt={product.name}
               width={400}
               height={100}
-              className="w-full h-80 object-center transition-transform duration-700 group-hover:scale-110"
+              className="w-full h-80 object-cover transition-transform duration-700 group-hover:scale-110"
               onError={() => setImgError(true)}
             />
           ) : (

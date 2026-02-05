@@ -17,30 +17,47 @@ const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 w-full backdrop-blur-xl h-20 border-b bg-background/80">
-      <div className="mx-auto flex h-full max-w-(--breakpoint-xl) items-center justify-between px-4 sm:px-6 lg:px-8">
+      {/* Added 'relative' here so we can absolute center the logo on mobile */}
+      <div className="relative mx-auto flex h-full max-w-(--breakpoint-xl) items-center justify-between px-4 sm:px-6 lg:px-8">
         
-        {/* Left: Logo */}
-        <Logo />
+        {/* --- LEFT SECTION --- */}
+        <div className="flex items-center">
+            {/* 1. Mobile Menu (Hamburger) - Visible only on Mobile */}
+            <div className="md:hidden mr-2">
+                <NavigationSheet user={user}/>
+            </div>
 
-        {/* Center: Desktop Menu (Hidden on Mobile) */}
+            {/* 2. Desktop Logo - Hidden on Mobile */}
+            <div className="hidden md:block">
+                <Logo />
+            </div>
+        </div>
+
+        {/* --- CENTER SECTION --- */}
+        
+        {/* 3. Mobile Logo - Absolutely Centered */}
+        <div className="md:hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <Logo />
+        </div>
+
+        {/* 4. Desktop Menu - Hidden on Mobile */}
         <NavMenu className="hidden md:block" />
 
-        {/* Right: Actions */}
-        <div className="flex items-center gap-3">
-          
 
+        {/* --- RIGHT SECTION (Actions) --- */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          
           <CartSidebar />
 
           <ModeToggle />
 
           {user ? (
-
             <div className="flex items-center gap-2">
               <UserDropdown
                 user={user as any}
                 trigger={
                   <div className="rounded-full border shadow-sm cursor-pointer hover:opacity-80 transition-opacity">
-                    <Avatar className="size-9">
+                    <Avatar className="size-8 sm:size-9"> {/* Made slightly smaller on mobile */}
                       <AvatarImage 
                         src={user.image || ""} 
                         alt={user.name || "User"} 
@@ -63,11 +80,8 @@ const Navbar = () => {
               </Button>
             </div>
           )}
-
-          {/* 4. Hamburger Menu (Mobile Only) */}
-          <div className="md:hidden ml-1">
-             <NavigationSheet />
-          </div>
+          
+          {/* Note: Removed NavigationSheet from here as it is now on the left */}
         </div>
       </div>
     </nav>

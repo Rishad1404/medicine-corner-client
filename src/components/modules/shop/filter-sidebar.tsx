@@ -2,10 +2,11 @@
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, X } from "lucide-react";
+import { Search, X, Filter } from "lucide-react"; // Added Filter icon
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge"; // Optional: for visual flair
 
 interface FilterSidebarProps {
   categories?: string[];
@@ -68,23 +69,36 @@ export function FilterSidebar({ categories = [] }: FilterSidebarProps) {
     });
   };
 
+  // Check if any filter is active
+  const hasActiveFilters = selectedCategory || minPrice || maxPrice;
+
   return (
-    <aside className="w-full space-y-6">
+    <aside className="w-full space-y-8 bg-white dark:bg-slate-950 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
+      
+      {/* ---------------- Header ---------------- */}
+      <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+        <h3 className="text-sm font-black uppercase tracking-wider text-blue-900 dark:text-white flex items-center gap-2">
+           <Filter className="h-4 w-4 text-pink-600" /> Filters
+        </h3>
+        {hasActiveFilters && (
+          <button
+            onClick={() => {
+                setMinPrice("");
+                setMaxPrice("");
+                router.push("/shop"); // Reset all
+            }}
+            className="text-[10px] font-bold text-pink-600 hover:text-blue-900 transition-colors flex items-center gap-1 bg-pink-50 dark:bg-pink-900/20 px-2 py-1 rounded-full"
+          >
+            <X className="h-3 w-3" /> Clear All
+          </button>
+        )}
+      </div>
+
       {/* ---------------- Categories ---------------- */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between px-1">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-slate-100">
-            Categories
-          </h3>
-          {selectedCategory && (
-            <button
-              onClick={() => updateParams({ category: null })}
-              className="text-[10px] text-red-500 hover:underline flex items-center gap-1"
-            >
-              <X className="h-3 w-3" /> Clear
-            </button>
-          )}
-        </div>
+      <div className="space-y-4">
+        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+          Categories
+        </h3>
 
         <div className="space-y-1">
           {categories.length ? (
@@ -95,86 +109,84 @@ export function FilterSidebar({ categories = [] }: FilterSidebarProps) {
                   key={cat}
                   onClick={() => handleCategory(cat)}
                   className={cn(
-                    "w-full text-left px-2 py-1.5 rounded-md text-xs transition-all duration-200 flex items-center justify-between",
+                    "w-full text-left px-3 py-2.5 rounded-xl text-xs transition-all duration-300 flex items-center justify-between group border border-transparent",
                     isActive
-                      ? "bg-indigo-50 text-indigo-700 font-bold dark:bg-indigo-900/20 dark:text-indigo-300"
-                      : "text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800"
+                      ? "bg-pink-50 text-pink-700 border-pink-100 font-bold dark:bg-pink-900/10 dark:text-pink-300 dark:border-pink-900/30"
+                      : "text-slate-600 hover:bg-slate-50 hover:pl-4 dark:text-slate-400 dark:hover:bg-slate-900"
                   )}
                 >
                   <span className="truncate">{cat}</span>
                   {isActive && (
-                    <span className="h-1.5 w-1.5 rounded-full bg-indigo-600" />
+                    <span className="h-2 w-2 rounded-full bg-pink-600 animate-pulse" />
                   )}
                 </button>
               );
             })
           ) : (
-            <p className="text-[10px] text-slate-400 px-2">
+            <p className="text-[10px] text-slate-400 italic">
               No categories found
             </p>
           )}
         </div>
       </div>
 
-      <div className="h-px bg-slate-100 dark:bg-slate-800" />
-
       {/* ---------------- Price ---------------- */}
-      <div className="space-y-3">
-        <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-slate-100 px-1">
+      <div className="space-y-4">
+        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
           Price Range
         </h3>
 
-        <div className="grid grid-cols-2 gap-2">
-          <div className="relative">
-            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">
-              ৳
-            </span>
-            <Input
-              type="number"
-              min={0}
-              placeholder="Min"
-              value={minPrice}
-              onChange={(e) => setMinPrice(e.target.value)}
-              className="h-8 pl-5 text-[11px]"
-            />
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="relative group">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 group-focus-within:text-pink-600 transition-colors">
+                ৳
+              </span>
+              <Input
+                type="number"
+                min={0}
+                placeholder="Min"
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
+                className="h-10 pl-7 text-xs rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-pink-200 focus:ring-4 focus:ring-pink-500/10 transition-all dark:bg-slate-900 dark:focus:bg-slate-950"
+              />
+            </div>
+
+            <div className="relative group">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 group-focus-within:text-pink-600 transition-colors">
+                ৳
+              </span>
+              <Input
+                type="number"
+                min={0}
+                placeholder="Max"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                className="h-10 pl-7 text-xs rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-pink-200 focus:ring-4 focus:ring-pink-500/10 transition-all dark:bg-slate-900 dark:focus:bg-slate-950"
+              />
+            </div>
           </div>
 
-          <div className="relative">
-            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">
-              ৳
-            </span>
-            <Input
-              type="number"
-              min={0}
-              placeholder="Max"
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(e.target.value)}
-              className="h-8 pl-5 text-[11px]"
-            />
-          </div>
+          <Button
+            onClick={applyPriceFilter}
+            className="w-full bg-pink-600 hover:bg-blue-900 text-white font-bold uppercase tracking-wide text-[10px] h-10 rounded-xl shadow-lg shadow-pink-600/20 transition-all duration-300"
+          >
+            Apply Filter
+          </Button>
         </div>
-
-        <Button
-          onClick={applyPriceFilter}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold uppercase text-[10px] h-8"
-        >
-          Apply
-        </Button>
       </div>
 
-      <div className="h-px bg-slate-100 dark:bg-slate-800" />
-
-      {/* ---------------- Brands (UI only for now) ---------------- */}
-      <div className="space-y-3">
-        <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-slate-100 px-1">
-          Brands
+      {/* ---------------- Brands (Visual Placeholder) ---------------- */}
+      <div className="space-y-4 pt-2">
+        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+          Search Brands
         </h3>
 
-        <div className="relative mb-2">
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-slate-400" />
+        <div className="relative group">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
           <Input
-            placeholder="Search..."
-            className="h-7 pl-7 text-[10px]"
+            placeholder="Search brand..."
+            className="h-10 pl-9 text-xs rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-blue-200 focus:ring-4 focus:ring-blue-500/10 transition-all dark:bg-slate-900 dark:focus:bg-slate-950"
           />
         </div>
       </div>

@@ -106,13 +106,11 @@ export function MedicineTable({ data, meta }: MedicineTableProps) {
   const [rowSelection, setRowSelection] = useState({});
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  // States for Modals
   const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [medicineToDelete, setMedicineToDelete] = useState<string | null>(null);
 
-  // --- ACTIONS ---
   const updateUrl = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (value) params.set(key, value); else params.delete(key);

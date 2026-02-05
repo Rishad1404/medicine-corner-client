@@ -13,11 +13,11 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
-  Eye,
   CircleDot,
   Calendar,
   ShoppingBag,
   Filter,
+  Star // 1. NEW: Import Star icon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,10 +38,22 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { OrderDetailsModal } from "./customer-order-details";
+import { ReviewModal } from "./review-modal";
+
 
 export function CustomerOrderTable({ data }: { data: any[] }) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
+
+
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [selectedMedicineId, setSelectedMedicineId] = useState<string>("");
+
+
+  const handleReviewClick = (medicineId: string) => {
+    setSelectedMedicineId(medicineId);
+    setReviewModalOpen(true);
+  };
 
   const columns = useMemo<ColumnDef<any>[]>(
     () => [
@@ -85,8 +97,8 @@ export function CustomerOrderTable({ data }: { data: any[] }) {
                 status === "DELIVERED"
                   ? "bg-emerald-50 text-emerald-600 border-emerald-100"
                   : status === "CANCELLED"
-                    ? "bg-rose-50 text-rose-600 border-rose-100"
-                    : "bg-blue-50 text-blue-600 border-blue-100",
+                  ? "bg-rose-50 text-rose-600 border-rose-100"
+                  : "bg-blue-50 text-blue-600 border-blue-100",
               )}
             >
               <CircleDot
@@ -107,12 +119,32 @@ export function CustomerOrderTable({ data }: { data: any[] }) {
             Action
           </div>
         ),
-        cell: ({ row }) => (
-          <div className="flex justify-end pr-4">
-            {/* Passing the current row's order data to the modal */}
-            <OrderDetailsModal order={row.original} />
-          </div>
-        ),
+        cell: ({ row }) => {
+          const order = row.original;
+          
+          const showReviewButton = order.status === "DELIVERED" && order.items?.length > 0;
+          const firstMedicineId = order.items?.[0]?.medicineId;
+
+          return (
+            <div className="flex justify-end items-center gap-3 pr-4">
+              
+
+              {showReviewButton && (
+                <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="h-8 px-3 text-[10px] font-bold uppercase tracking-wider text-pink-600 bg-pink-50 hover:bg-pink-100 hover:text-pink-700 rounded-lg transition-colors"
+                    onClick={() => handleReviewClick(firstMedicineId)}
+                >
+                    <Star className="h-3 w-3 mr-1.5" /> Rate
+                </Button>
+              )}
+
+              {/* Passing the current row's order data to the details modal */}
+              <OrderDetailsModal order={row.original} />
+            </div>
+          );
+        },
       },
     ],
     [],
@@ -250,6 +282,13 @@ export function CustomerOrderTable({ data }: { data: any[] }) {
           </Button>
         </div>
       </div>
+
+
+      <ReviewModal
+        medicineId={selectedMedicineId} 
+        isOpen={reviewModalOpen} 
+        onClose={() => setReviewModalOpen(false)} 
+      />
     </div>
   );
 }

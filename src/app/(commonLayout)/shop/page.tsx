@@ -38,7 +38,7 @@ export default async function ShopPage(props: {
       <div className="max-w-[1600px] mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row gap-8 items-start">
           
-          <aside className="hidden md:block w-48 shrink-0 sticky top-20 pt-2">
+          <aside className="hidden md:block w-64 shrink-0 sticky top-20 pt-2">
              <div className="flex items-center gap-2 mb-6 text-slate-500 font-bold text-xs uppercase tracking-wider">
                 <SlidersHorizontal className="h-3.5 w-3.5" /> Refine Selection
              </div>
